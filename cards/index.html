@@ -1,0 +1,1350 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<title>낱말 카드 대작전</title>
+<meta name="description" content="그림을 보고 맞는 낱말 카드를 콕! 세현이의 한글·영어 놀이">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="낱말 카드 대작전">
+<meta property="og:title" content="낱말 카드 대작전">
+<meta property="og:description" content="그림을 보고 맞는 낱말 카드를 콕! 세현이의 한글·영어 놀이">
+<meta property="og:url" content="https://ohkscman.github.io/sehyun-games/cards/">
+<meta property="og:image" content="https://ohkscman.github.io/sehyun-games/cards/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5bb9ff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="낱말 카드 대작전">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Andika:wght@700&family=Black+Han+Sans&family=Jua&display=swap">
+<style>
+/* Layout: toy-box arcade. Word well on the left, brick workbench on the right; on phones the picture card and workbench sit side by side above the well. */
+:root{
+  --sky:#5bb9ff;
+  --sky-dot:rgba(255,255,255,.18);
+  --ink:#14234b;
+  --sun:#ffd23f;
+  --card:#ffffff;
+  --tint:#e8f5ff;
+  --tint-line:#a9d3f5;
+  --well:#1d2c66;
+  --well-line:rgba(255,255,255,.06);
+  --plate:#35a845;
+  --hot:#ff5a4e;
+  --hot-soft:#ffdcd8;
+  --muted:#53618c;
+  --f-display:"Black Han Sans","Jua","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-body:"Jua","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-emoji:"Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif;
+  --f-latin:"Andika","Jua",system-ui,sans-serif;
+  color-scheme:light;
+}
+html{height:100%;box-sizing:border-box}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+body{
+  height:100%;margin:0;overflow:hidden;
+  background-color:var(--sky);
+  background-image:radial-gradient(circle,var(--sky-dot) 0 5px,transparent 6px);
+  background-size:34px 34px;
+  color:var(--ink);font-family:var(--f-body);font-size:16px;
+  padding-block:12px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));
+  padding-right:max(16px,env(safe-area-inset-right,0px));
+  touch-action:manipulation;-webkit-user-select:none;user-select:none;
+  -webkit-tap-highlight-color:transparent;
+}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible{outline:4px solid var(--sun);outline-offset:3px}
+
+.app{height:100%;max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+
+/* ---------- header ---------- */
+.top{display:flex;align-items:center;gap:10px 16px;flex-wrap:wrap}
+.logo{display:flex;align-items:center;gap:4px;font-family:var(--f-display);font-size:1.35rem}
+.logo .tag{margin-left:6px;color:var(--card);text-shadow:0 3px 0 var(--ink),2px 0 0 var(--ink),-2px 0 0 var(--ink),0 -2px 0 var(--ink)}
+.tile{
+  display:inline-grid;place-items:center;width:1.7em;height:1.7em;border-radius:8px;
+  background:var(--pc);color:var(--ink);
+  box-shadow:inset 0 3px 0 rgba(255,255,255,.45),inset 0 -4px 0 rgba(0,0,0,.18),0 0 0 3px var(--ink);
+}
+.meter{display:flex;align-items:center;gap:6px;flex:1;justify-content:center;min-width:0}
+.slot{width:24px;height:24px;border-radius:50%;border:3px solid var(--ink);background:rgba(255,255,255,.55);transition:background .25s,transform .25s}
+.slot.on{background:var(--sun);box-shadow:inset 0 -4px 0 rgba(0,0,0,.15);transform:scale(1.1)}
+.holes{display:inline-flex;align-items:center;gap:6px;background:var(--hot);color:var(--card);border:3px solid var(--ink);border-radius:999px;padding:2px 10px 2px 6px;font-size:.95rem}
+.holes i{width:16px;height:16px;border-radius:50%;background:var(--ink);box-shadow:inset 0 0 0 3px #6b0f0a}
+.tools{display:flex;gap:8px}
+.tool{
+  display:inline-flex;align-items:center;gap:6px;background:var(--card);border:3px solid var(--ink);
+  border-radius:14px;padding:6px 12px;box-shadow:0 4px 0 var(--ink);font-size:1rem;white-space:nowrap;
+}
+.tool:active{transform:translateY(3px);box-shadow:0 1px 0 var(--ink)}
+.tool svg{width:20px;height:20px;flex:none}
+
+/* ---------- stage ---------- */
+.stage{
+  flex:1;min-height:0;display:grid;gap:14px;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);
+  grid-template-rows:auto minmax(0,1fr);
+  grid-template-areas:"quiz build" "well build";
+}
+.panel{background:var(--card);border:4px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink)}
+
+.quiz{grid-area:quiz;display:flex;align-items:center;gap:16px;padding:12px 16px;min-width:0}
+.pic{
+  flex:none;width:clamp(86px,15vh,132px);aspect-ratio:1;display:grid;place-items:center;
+  font-family:var(--f-emoji);font-size:clamp(54px,10vh,92px);line-height:1;
+  background:var(--tint);border:3px dashed var(--tint-line);border-radius:18px;
+}
+.pic.in{animation:picIn .5s cubic-bezier(.3,1.6,.5,1)}
+.pic.yay{animation:picYay .6s ease}
+.qtext{display:flex;flex-direction:column;gap:6px;min-width:0;flex:1}
+.ask{font-size:clamp(1.4rem,3.4vh,2.1rem)}
+.answer{
+  align-self:flex-start;font-family:var(--f-display);font-size:clamp(1.8rem,5vh,3rem);
+  background:var(--sun);border:3px solid var(--ink);border-radius:12px;padding:0 14px;line-height:1.35;
+  animation:picIn .45s cubic-bezier(.3,1.6,.5,1);
+}
+.answer.en{font-family:var(--f-latin)}
+.answer.upper .w{text-transform:uppercase}
+.answer .mean{font-family:var(--f-body);font-size:.5em;margin-left:8px;vertical-align:middle}
+.msg{font-size:1.05rem;color:var(--muted);min-height:1.4em}
+.msg.bad{color:var(--hot)}
+.msg.good{color:var(--plate)}
+.hear{
+  align-self:flex-start;display:inline-flex;align-items:center;gap:6px;background:var(--tint);
+  border:3px solid var(--ink);border-radius:12px;padding:4px 12px;font-size:1rem;box-shadow:0 3px 0 var(--ink);
+}
+.hear:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+.hear svg{width:20px;height:20px}
+
+/* ---------- well ---------- */
+.well-wrap{grid-area:well;position:relative;min-height:0;display:flex;align-items:stretch;justify-content:center}
+.well{
+  --cw:160px;--ch:120px;width:100%;height:100%;max-width:760px;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));
+  gap:clamp(12px,2.6vw,20px);padding:6px 6px 14px;
+}
+.card{
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  min-width:0;min-height:0;padding:16px 8px 8px;overflow:hidden;
+  background:var(--card);border:4px solid var(--ink);border-radius:22px;box-shadow:0 7px 0 var(--ink);
+  transform:rotate(var(--tilt));transition:transform .12s,box-shadow .12s;touch-action:manipulation;
+}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:14px;background:var(--pc);border-bottom:3px solid var(--ink)}
+.card .w{font-size:min(calc(var(--cw) * .8 / (var(--len) + .5)), calc(var(--ch) * .46));line-height:1.15;color:var(--ink);white-space:nowrap}
+.card .e{font-family:var(--f-emoji);font-size:calc(var(--ch) * .26);line-height:1}
+.well.en .card .w{font-family:var(--f-latin);font-size:min(calc(var(--cw) * 1.25 / (var(--len) + 1.2)), calc(var(--ch) * .5))}
+.well.en.upper .card .w{text-transform:uppercase;font-size:min(calc(var(--cw) * 1.05 / (var(--len) + 1)), calc(var(--ch) * .46))}
+.card:hover{filter:brightness(1.03)}
+.card:active{transform:rotate(var(--tilt)) translateY(5px);box-shadow:0 2px 0 var(--ink)}
+.card.deal{animation:deal .5s cubic-bezier(.3,1.4,.5,1) calc(var(--i) * 120ms) both}
+.card.right{z-index:3;background:var(--sun);transform:none;box-shadow:0 7px 0 var(--ink),0 0 26px 8px rgba(255,210,63,.9);animation:cardRight .7s ease}
+.card.wrong{background:var(--hot-soft);animation:cardWrong .45s ease}
+.card.used{background:#dde4ef;border-color:#7d89aa;pointer-events:none;box-shadow:0 3px 0 #7d89aa}
+.card.used::before{background:#b9c3d8;border-bottom-color:#7d89aa}
+.card.used .w{color:var(--muted)}
+.card.fade{opacity:.45;transform:scale(.94);transition:opacity .4s,transform .4s;pointer-events:none}
+@keyframes deal{from{transform:translateY(-50px) rotate(-14deg) scale(.6);opacity:0}to{transform:rotate(var(--tilt));opacity:1}}
+@keyframes cardRight{0%{transform:scale(1)}35%{transform:scale(1.1)}100%{transform:scale(1)}}
+@keyframes cardWrong{20%{transform:translateX(-9px)}40%{transform:translateX(9px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
+.star{
+  position:absolute;width:18px;height:18px;margin:-9px 0 0 -9px;background:var(--sun);pointer-events:none;z-index:4;
+  clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);
+  animation:star .8s ease-out forwards;
+}
+
+/* ---------- workbench ---------- */
+.build{grid-area:build;display:flex;flex-direction:column;padding:12px 14px 14px;min-width:0;min-height:0}
+.build-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.build-label{font-size:.95rem;color:var(--muted)}
+.build-name{font-family:var(--f-display);font-size:clamp(1.2rem,3vh,1.7rem);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.build-count{font-family:var(--f-display);font-size:1.2rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.model-box{flex:1;min-height:60px;position:relative;margin-top:6px}
+.model-grid{
+  --bs:16px;position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:calc(var(--mw)*var(--bs));height:calc((var(--mh) + .4)*var(--bs));
+}
+.brick{
+  position:absolute;left:calc(var(--x)*var(--bs));top:calc((var(--y) + .4)*var(--bs));
+  width:var(--bs);height:var(--bs);border-radius:2px;
+}
+.brick.ghost{background:rgba(20,35,75,.05);box-shadow:inset 0 0 0 1px rgba(20,35,75,.16)}
+.brick.on{
+  background:var(--bc);
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.35),inset 0 -3px 0 rgba(0,0,0,.22),0 0 0 1px rgba(0,0,0,.28);
+}
+.brick.on.stud::before{
+  content:"";position:absolute;left:22%;width:56%;top:-22%;height:24%;background:var(--bc);
+  border-radius:3px 3px 0 0;box-shadow:inset 0 2px 0 rgba(255,255,255,.4),0 0 0 1px rgba(0,0,0,.28);
+}
+.brick.drop{animation:drop .5s cubic-bezier(.3,1.5,.5,1) var(--d,0ms) both}
+.brick.leaving{animation:off .5s ease-in forwards}
+.model-grid.celebrate .brick.on{animation:hop .6s ease calc(var(--x)*45ms) 3}
+.plate{
+  height:18px;margin-top:2px;background-color:var(--plate);
+  background-image:radial-gradient(circle at 50% 50%,rgba(255,255,255,.35) 0 3px,transparent 4px);
+  background-size:14px 14px;background-position:center;
+  border:3px solid var(--ink);border-radius:6px;
+}
+
+/* ---------- overlays ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:50;display:flex;overflow:auto;background:rgba(20,35,75,.6);
+  padding-top:calc(16px + env(safe-area-inset-top,0px));padding-bottom:calc(16px + env(safe-area-inset-bottom,0px));
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+}
+.sheet{
+  margin:auto;width:100%;max-width:780px;background:var(--card);border:4px solid var(--ink);border-radius:26px;
+  box-shadow:0 8px 0 var(--ink);padding:24px clamp(16px,4vw,32px);display:flex;flex-direction:column;gap:18px;
+  animation:picIn .45s cubic-bezier(.3,1.4,.5,1);
+}
+.hero-title{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px;font-family:var(--f-display);font-size:clamp(1.8rem,6vw,2.8rem)}
+.hero-title .tag{margin-left:4px}
+.lead{text-align:center;font-size:1.25rem;margin:0;text-wrap:balance}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;padding:0;list-style:none}
+.steps li{background:var(--tint);border-radius:14px;padding:10px;text-align:center;font-size:1.05rem;display:flex;flex-direction:column;gap:4px;align-items:center}
+.steps b{display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--card);font-weight:normal}
+.rules{margin:0;font-size:.95rem;color:var(--muted);text-align:center;line-height:1.5;text-wrap:balance}
+.h2{font-family:var(--f-display);font-size:1.5rem;margin:0;text-align:center}
+.choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.choice{
+  display:flex;flex-direction:column;align-items:center;gap:8px;padding:12px 8px 10px;background:var(--tint);
+  border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);font-size:1.15rem;min-width:0;
+}
+.choice:hover{background:#fff6cc}
+.choice:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.choice span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.choice .new{font-size:.8rem;background:var(--hot);color:var(--card);border-radius:999px;padding:1px 8px}
+.choice .new.gotit{background:var(--plate)}
+.choice.done{background:#eefbe9;border-color:#2f7a3b}
+.resume{align-self:center}
+.resume-card{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 14px;align-items:center;background:#fff6cc;border:3px solid var(--ink);border-radius:18px;padding:12px 14px;box-shadow:0 5px 0 var(--ink)}
+.rc-model{width:110px}
+.rc-text{display:flex;flex-direction:column;gap:2px;font-size:1.1rem;min-width:0}
+.rc-text b{font-family:var(--f-display);font-weight:normal;font-size:1.3rem}
+.rc-btns{grid-column:1 / -1;display:grid;grid-template-columns:1fr;gap:10px}
+.rc-btns .big{font-size:1.2rem;padding:10px 12px}
+.quit{max-width:520px;align-items:center;text-align:center}
+.quit-model{display:flex;justify-content:center;width:100%}
+.quit-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%}
+.big.danger{background:var(--hot);color:var(--card)}
+.linkish{background:none;border:0;font-size:1.15rem;color:var(--muted);text-decoration:underline;text-underline-offset:4px;padding:6px 12px}
+@media (max-width:420px){.quit-btns{grid-template-columns:1fr}}
+.modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.mode{
+  display:flex;align-items:center;justify-content:center;gap:12px;padding:14px 10px;background:var(--card);
+  border:3px solid var(--ink);border-radius:18px;box-shadow:0 5px 0 var(--ink);font-size:1.3rem;min-width:0;
+}
+.mode .tile{font-family:var(--f-display);font-size:.95rem}
+.mode .tile.lat{font-family:var(--f-latin)}
+.mode[aria-pressed="true"]{background:var(--sun)}
+.mode{position:relative}
+.mode .pill{position:absolute;top:-12px;right:-4px;background:var(--hot);color:var(--card);border:3px solid var(--ink);border-radius:999px;font-size:.8rem;padding:0 9px;white-space:nowrap}
+.mode:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.mode-tiles{display:flex;gap:6px}
+.learned .lat{font-family:var(--f-latin)}
+.learned small{font-size:.8em;color:var(--muted)}
+.big{
+  background:var(--sun);border:3px solid var(--ink);border-radius:16px;box-shadow:0 5px 0 var(--ink);
+  padding:10px 24px;font-size:1.35rem;
+}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.shelf-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;border-top:3px dashed var(--tint-line);padding-top:16px}
+.shelf-head .h2{text-align:left;font-size:1.25rem}
+.shelf-head{flex-wrap:wrap}
+.shelf-head > span{font-family:var(--f-display);font-variant-numeric:tabular-nums;font-size:.95rem}
+.shelf{display:flex;flex-direction:column;gap:14px}
+.mgroup{display:flex;flex-direction:column;gap:6px}
+.mgroup-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:1rem}
+.mgroup-head b{font-weight:normal;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mgroup.locked .mgroup-head{color:var(--muted)}
+.row5{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stile{display:flex;flex-direction:column;align-items:center;gap:2px;background:var(--tint);border-radius:12px;padding:8px 4px 4px;font-size:.8rem;min-width:0;border:2px solid transparent}
+.stile span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stile.miss{color:var(--muted)}
+.stile.got{border-color:var(--plate)}
+.stamp{font-family:var(--f-display);background:var(--hot);color:var(--card);border-radius:8px;padding:1px 10px;transform:rotate(-4deg);white-space:nowrap}
+.lock{font-size:.9rem;color:var(--muted);white-space:nowrap}
+.mission{display:flex;flex-direction:column;gap:10px;background:var(--tint);border:3px solid var(--ink);border-radius:18px;padding:12px 14px}
+.mission-top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mbadge{font-family:var(--f-display);background:var(--ink);color:var(--card);border-radius:999px;padding:2px 12px;white-space:nowrap}
+.mission-name{font-family:var(--f-display);font-size:1.35rem;flex:1;min-width:0}
+.lvl{font-size:.9rem;color:var(--muted);white-space:nowrap}
+.mission-count{font-family:var(--f-display);font-size:1.2rem;font-variant-numeric:tabular-nums}
+.mission .stile{background:var(--card)}
+.mclear{background:var(--sun);border:3px solid var(--ink);border-radius:20px;padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;animation:picIn .6s cubic-bezier(.3,1.6,.5,1) .3s both}
+.medal{width:72px;height:72px;border-radius:50%;background:var(--hot);border:4px solid var(--ink);display:grid;place-items:center;box-shadow:0 4px 0 var(--ink)}
+.medal::before{content:"";width:40px;height:40px;background:var(--sun);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+.mclear h3{font-family:var(--f-display);font-size:clamp(1.6rem,5vw,2.2rem);margin:0;font-weight:normal}
+.mclear p{margin:0;font-size:1.1rem}
+.mclear .row5{width:100%}
+.mclear .stile{background:var(--card)}
+.done-title{font-family:var(--f-display);font-size:clamp(2rem,7vw,3.2rem);text-align:center;margin:0;text-wrap:balance}
+.praise{margin:-8px 0 0;text-align:center;font-size:clamp(1.3rem,4vw,1.8rem);color:var(--hot);text-wrap:balance}
+.praise.lat{font-family:var(--f-latin)}
+.done-model{display:flex;justify-content:center}
+.done-model canvas{animation:hopBig 1s ease 2}
+.learned{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.learned button{display:inline-flex;align-items:center;gap:6px;background:var(--tint);border:3px solid var(--ink);border-radius:999px;padding:4px 14px 4px 8px;font-size:1.2rem}
+.learned i{font-style:normal;font-family:var(--f-emoji)}
+.confetti{position:fixed;top:-20px;width:12px;height:16px;z-index:60;pointer-events:none;border-radius:2px;animation:fall var(--t) linear var(--dl) forwards}
+
+/* ---------- motion ---------- */
+@keyframes spawn{from{opacity:0;transform:translateY(-40%)}to{opacity:1;transform:none}}
+@keyframes thud{40%{transform:scaleY(.86) scaleX(1.04);transform-origin:bottom}}
+@keyframes right{20%{transform:scale(1.2)}60%{transform:scale(1.15) translateY(-10%)}100%{transform:scale(.5) translateY(-200%);opacity:0}}
+@keyframes wrong{0%,40%{transform:translateX(0)}8%{transform:translateX(-8px)}16%{transform:translateX(8px)}24%{transform:translateX(-6px)}32%{transform:translateX(6px)}100%{transform:translateY(120%) rotate(18deg);opacity:0}}
+@keyframes star{from{transform:translate(0,0) scale(.4) rotate(0)}to{transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(160deg);opacity:0}}
+@keyframes drop{from{transform:translateY(calc(var(--bs)*-5));opacity:0}50%{opacity:1}to{transform:none;opacity:1}}
+@keyframes off{to{transform:translateY(calc(var(--bs)*3)) rotate(30deg);opacity:0}}
+@keyframes hop{50%{transform:translateY(calc(var(--bs)*-.6))}}
+@keyframes hopBig{30%{transform:translateY(-12px) rotate(-2deg)}60%{transform:translateY(0) rotate(2deg)}}
+@keyframes picIn{from{transform:scale(.6);opacity:0}to{transform:none;opacity:1}}
+@keyframes picYay{30%{transform:scale(1.15) rotate(-6deg)}60%{transform:scale(1.05) rotate(5deg)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(var(--rot))}}
+
+/* ---------- phones ---------- */
+@media (max-width:760px){
+  .logo{font-size:1.05rem}
+  .slot{width:17px;height:17px;border-width:2.5px}
+  .meter{gap:4px;order:3;flex-basis:100%}
+  .tools{margin-left:auto}
+  .tool span{display:none}
+  .stage{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"quiz build" "well well";gap:10px}
+  .quiz{flex-direction:column;gap:4px;padding:8px;text-align:center}
+  .pic{width:clamp(64px,11vh,96px);font-size:clamp(40px,7vh,64px);border-radius:14px}
+  .qtext{align-items:center;gap:2px}
+  .ask{font-size:1.15rem}
+  .answer{align-self:center;font-size:1.6rem}
+  .msg{font-size:.9rem}
+  .hear{align-self:center;padding:2px 10px;font-size:.9rem}
+  .build{padding:8px 10px 10px}
+  .build-label{display:none}
+  .build-name{font-size:1rem}
+  .build-count{font-size:1rem}
+  .plate{height:14px}
+  .steps{grid-template-columns:1fr}
+  .steps li{flex-direction:row;text-align:left}
+}
+@media (max-width:420px){.choices{gap:8px}.choice{font-size:1rem;padding:8px 4px}}
+@media (max-width:560px){
+  .mode{flex-direction:column;gap:6px;font-size:1.15rem;white-space:nowrap;padding:12px 6px}
+  .mission-top{gap:6px 10px}
+  .mission-top .mission-name{order:5;flex-basis:100%}
+  .mission-top .mission-count{margin-left:auto}
+  .mgroup-head{font-size:.9rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .confetti{display:none}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="logo" id="logo" aria-label="한글 카드 대작전">
+      <span class="tile" style="--pc:#ff8c8c">한</span><span class="tile" style="--pc:#5fd6ff">글</span><span class="tile" style="--pc:#ffd23f">카</span><span class="tile" style="--pc:#7fe08a">드</span><span class="tag">대작전</span>
+    </div>
+    <div class="meter" id="meter" aria-live="polite"></div>
+    <div class="tools">
+      <button class="tool" id="caseBtn" type="button" aria-label="대문자 소문자 바꾸기" hidden>
+        <span style="display:inline;font-family:var(--f-latin)" id="caseLabel">abc</span>
+      </button>
+      <button class="tool" id="speedBtn" type="button" hidden aria-label="떨어지는 속도 바꾸기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 13l4-4"/><path d="M3.5 18a9 9 0 1 1 17 0"/></svg>
+        <span id="speedLabel">보통</span>
+      </button>
+      <button class="tool" id="soundBtn" type="button" aria-label="소리 켜기 끄기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path id="soundWave" d="M16.5 8.5a5 5 0 0 1 0 7"/></svg>
+        <span id="soundLabel">소리 켬</span>
+      </button>
+      <button class="tool" id="homeBtn" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>
+        <span>처음으로</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage">
+    <section class="quiz panel" aria-label="그림 문제">
+      <div class="pic" id="pic" role="img" aria-label="문제 그림">🍎</div>
+      <div class="qtext">
+        <div class="ask" id="ask">이건 뭘까?</div>
+        <div class="answer" id="answer" hidden></div>
+        <div class="msg" id="msg">맞는 낱말 카드를 콕!</div>
+        <button class="hear" id="hearBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>
+          들어보기
+        </button>
+      </div>
+    </section>
+
+    <div class="well-wrap" id="wellWrap">
+      <div class="well" id="well" aria-label="낱말 카드"></div>
+    </div>
+
+    <aside class="build panel" aria-label="만들고 있는 모형">
+      <div class="build-head">
+        <div style="min-width:0;display:flex;flex-direction:column">
+          <span class="build-label" id="mlabel">지금 만드는 모형</span>
+          <span class="build-name" id="mname">경찰차</span>
+        </div>
+        <span class="build-count" id="mcount">0 / 10</span>
+      </div>
+      <div class="model-box" id="mbox"><div class="model-grid" id="mgrid"></div></div>
+      <div class="plate"></div>
+    </aside>
+  </main>
+</div>
+
+<div class="overlay" id="startOv">
+  <div class="sheet">
+    <div class="hero-title" aria-label="낱말 카드 대작전">
+      <span class="tile" style="--pc:#ff8c8c">낱</span><span class="tile" style="--pc:#5fd6ff">말</span><span class="tile" style="--pc:#ffd23f">카</span><span class="tile" style="--pc:#7fe08a">드</span><span class="tag">대작전</span>
+    </div>
+    <div class="resume-card" id="resumeCard" hidden>
+      <div class="rc-model" id="rcModel"></div>
+      <div class="rc-text"><b id="rcTitle">지난번에 저장된 게임이 있어요</b><span id="rcInfo"></span></div>
+      <div class="rc-btns">
+        <button class="big" id="resumeBtn" type="button">지난번 저장된 것부터 시작하기</button>
+        <button class="big danger" id="restartBtn" type="button">처음부터 새로 시작하기</button>
+      </div>
+    </div>
+    <h2 class="h2">어떤 놀이를 할까?</h2>
+    <div class="modes">
+      <button class="mode" type="button" data-lang="ko" aria-pressed="true">
+        <span class="mode-tiles"><span class="tile" style="--pc:#ff8c8c">가</span><span class="tile" style="--pc:#5fd6ff">나</span></span>한글 놀이
+      </button>
+      <button class="mode" type="button" data-lang="en" aria-pressed="false">
+        <span class="mode-tiles"><span class="tile lat" style="--pc:#ffd23f">A</span><span class="tile lat" style="--pc:#7fe08a">B</span></span>영어 놀이
+      </button>
+    </div>
+    <ol class="steps">
+      <li><b>1</b>위에 나온 그림을 봐요</li>
+      <li><b>2</b>카드 4장 중에서<br>그림 이름을 콕! 눌러요</li>
+      <li><b>3</b>10번 맞히면<br>멋진 모형 완성!</li>
+    </ol>
+    <p class="rules">모형 3개를 모으면 미션 클리어! 미션은 모두 25개이고, 미션이 올라갈수록 단어가 조금씩 어려워져요. 한글과 영어는 수집함이 따로예요. 틀리면 쌓은 블록이 하나 떨어져요. 블록이 하나도 없을 때 틀리면 구멍이 생기고, 다음 정답은 구멍을 메우는 데 써요.</p>
+    <div class="mission" id="missionCard"></div>
+    <h2 class="h2" id="chooseH">무엇을 만들까?</h2>
+    <div class="choices" id="choices"></div>
+    <div class="shelf-head"><h2 class="h2">내 모형 수집함 <small id="shelfLang" style="font-family:var(--f-body);font-size:.8rem;color:var(--muted)"></small></h2><span id="colCount">미션 0 / 6</span></div>
+    <div class="shelf" id="shelf"></div>
+    <p class="rules" style="margin-top:4px">앱 버전 v14 · 미션 25개 · 모형 75개 · 미션마다 모형 3개</p>
+  </div>
+</div>
+
+<div class="overlay" id="doneOv" hidden>
+  <div class="sheet">
+    <h2 class="done-title" id="doneTitle">경찰차 완성!</h2>
+    <p class="praise" id="donePraise"></p>
+    <div class="done-model" id="doneModel"></div>
+    <div class="mclear" id="mclear" hidden></div>
+    <h2 class="h2" style="font-size:1.2rem">오늘 맞힌 단어 (누르면 소리가 나요)</h2>
+    <div class="learned" id="learned"></div>
+    <button class="big resume" id="againBtn" type="button">다른 모형 만들기</button>
+  </div>
+</div>
+
+<div class="overlay" id="quitOv" hidden>
+  <div class="sheet quit" role="dialog" aria-modal="true" aria-labelledby="quitTitle">
+    <h2 class="done-title" id="quitTitle" style="font-size:clamp(1.8rem,6vw,2.4rem)">그만할까요?</h2>
+    <div class="quit-model" id="quitModel"></div>
+    <p class="lead" id="quitInfo"></p>
+    <div class="quit-btns">
+      <button class="big" id="saveQuitBtn" type="button">저장하고 나가기</button>
+      <button class="big danger" id="resetQuitBtn" type="button">저장 안 하고 나가기</button>
+    </div>
+    <p class="rules">저장하면 다음에 지금 상태부터 이어서 할 수 있어요.<br>저장 안 하고 나가면 이번에 한 것(새로 모은 모형 포함)은 사라지고 지난번 저장 상태로 돌아가요.</p>
+    <button class="linkish" id="keepBtn" type="button">계속 놀기</button>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const COLS = 8, ROWS = 10, STEPS = 10, LOOP_MS = 100, SPAWN_MS = 2600;
+/* 한 칸 내려가는 데 걸리는 시간 */
+const SPEEDS = [{label:'천천히', ms:5500}, {label:'보통', ms:4000}, {label:'빠르게', ms:2800}];
+const PIECE_COLORS = ['#5fd6ff','#ffd23f','#c9a4ff','#7fe08a','#ff8c8c','#ffb054','#ff9fd4'];
+const PAL = {R:'#e3271b',C:'#a3141c',B:'#1e66c9',V:'#1b2f6e',L:'#8fd3ff',T:'#14a6a0',G:'#2f9b47',D:'#1d5c35',H:'#9ad94a',Y:'#ffcd1f',A:'#d99a14',O:'#ff8a1c',N:'#8a5a2b',F:'#f6c79a',M:'#ff7fbf',I:'#ffc2da',P:'#9146c2',W:'#f6f7f9',S:'#a9b0b8',E:'#50565e',K:'#23272e'};
+
+/* 단어 교과과정: [단어, 그림, 레벨(1 쉬움 ~ 5 어려움), 비슷하게 생긴 진짜 단어 후보들(, 영어는 우리말 뜻)] */
+const KO_WORDS = [["나비","🦋",1,["나무","비누","아기","바지","가지","오리","하마"]],["오리","🦆",1,["오이","코끼리","도토리","고래","아기","개구리","너구리"]],["하마","🦛",1,["치마","하트","나무","고구마","사자","거미","개미"]],["기차","🚂",1,["기타","고기","고추","아기","고래","피자","거미"]],["모자","🧢",1,["사자","피자","바지","치즈","가지","소파","오리"]],["우유","🥛",1,["여우","새우","오이","오리","아기","가위","키위"]],["사자","🦁",1,["모자","피자","사과","바지","가지","소파","하마"]],["여우","🦊",1,["우유","새우","오이","오리","아기","가위","키위"]],["토끼","🐰",1,["도끼","코끼리","오리","오이","고기","토마토","나비"]],["고래","🐳",1,["고추","고기","오리","기차","거미","개미","가위"]],["나무","🌳",1,["나비","하마","거미","개미","치마","사자","여우"]],["피자","🍕",1,["모자","사자","치즈","피아노","기차","포도","바지"]],["거미","🕷️",1,["개미","고기","가지","하마","기차","고래","나무"]],["개미","🐜",1,["거미","고기","가지","하마","기차","고래","나무"]],["오이","🥒",1,["오리","오토바이","우유","여우","아기","토끼","가위"]],["아기","👶",1,["고기","오리","기차","오이","기타","사과","나비"]],["포도","🍇",1,["지도","도끼","피자","구두","아보카도","도토리","오리"]],["바지","👖",1,["가지","소시지","사자","지도","나비","모자","피자"]],["가위","✂️",1,["키위","가지","기차","우유","여우","고래","거미"]],["치즈","🧀",1,["치마","치타","피자","모자","사자","바지","가지"]],["기타","🎸",1,["기차","치타","고기","아기","파스타","고래","피자"]],["키위","🥝",1,["가위","쿠키","스키","우유","여우","오이","새우"]],["지도","🗺️",1,["포도","바지","가지","도끼","구두","아보카도","기차"]],["구두","👞",1,["고추","개구리","고구마","기차","고래","거미","개미"]],["고추","🌶️",1,["고래","고기","기차","구두","고구마","거미","개미"]],["고기","🍖",1,["기차","고래","아기","기타","고추","고구마","거미"]],["쿠키","🍪",1,["키위","스키","키보드","스쿠터","나비","오리","우유"]],["새우","🦐",1,["우유","여우","사자","오이","가위","키위","소파"]],["가지","🍆",1,["바지","가위","소시지","사자","거미","개미","지도"]],["치마","👗",1,["치타","하마","치즈","고구마","기차","나무","피자"]],["비누","🧼",1,["나비","바지","버스","기차","여우","나무","피자"]],["소파","🛋️",1,["사자","모자","새우","스키","사과","시계","소시지"]],["하트","❤️",1,["하마","기타","치타","나비","사자","나무","아기"]],["버스","🚌",1,["스키","바지","비누","마스크","파스타","거미","치즈"]],["스키","⛷️",1,["쿠키","스쿠터","키위","버스","사자","새우","소파"]],["치타","🐆",1,["기타","치마","치즈","파스타","기차","피자","하트"]],["사과","🍎",1,["사자","시계","아기","고기","새우","소파","스키"]],["코","👃",1,["소","새","개","해","배","코끼리","코알라"]],["소","🐄",1,["새","소파","코","개","해","배","소시지"]],["새","🐦",1,["소","새우","개","해","배","코","귀"]],["개","🐕",1,["귀","개미","새","해","배","무지개","코"]],["해","☀️",1,["새","개","배","코","소","귀","쥐"]],["배","🚢",1,["새","개","해","코","소","귀","쥐"]],["바나나","🍌",2,["피아노","나비","나무","카메라","파스타","해바라기","토마토"]],["토마토","🍅",2,["도토리","고구마","토끼","오토바이","마스크","피아노","카메라"]],["코끼리","🐘",2,["도토리","코알라","개구리","너구리","카메라","오리","케이크"]],["거북이","🐢",2,["개구리","너구리","고구마","케이크","오토바이","라디오","키보드"]],["개구리","🐸",2,["너구리","고구마","코끼리","도토리","거북이","무지개","카메라"]],["비행기","✈️",2,["해바라기","바나나","무지개","아기","고기","코끼리","거북이"]],["피아노","🎹",2,["바나나","토마토","코알라","케이크","파스타","피자","라디오"]],["도토리","🌰",2,["코끼리","개구리","너구리","토마토","오리","오토바이","코알라"]],["너구리","🦝",2,["개구리","코끼리","도토리","고구마","거북이","카메라","오리"]],["고구마","🍠",2,["개구리","너구리","토마토","마스크","고기","거북이","하마"]],["코알라","🐨",2,["코끼리","카메라","케이크","피아노","도토리","라디오","해바라기"]],["카메라","📷",2,["코알라","코끼리","라디오","바나나","토마토","개구리","도토리"]],["라디오","📻",2,["카메라","코알라","바나나","토마토","코끼리","거북이","피아노"]],["케이크","🎂",2,["마스크","코끼리","코알라","키보드","거북이","피아노","카메라"]],["소시지","🌭",2,["무지개","코끼리","바지","가지","도토리","마스크","스쿠터"]],["해바라기","🌻",2,["오토바이","아보카도","바나나","비행기","코알라","카메라","아기"]],["오토바이","🏍️",2,["해바라기","오이","아보카도","도토리","거북이","바나나","토마토"]],["무지개","🌈",2,["소시지","개구리","마스크","코끼리","비행기","라디오","케이크"]],["마스크","😷",2,["파스타","케이크","토마토","고구마","스쿠터","소시지","무지개"]],["시계","⏰",2,["사과","사자","아기","고기","새우","소파","스키"]],["귀","👂",2,["개","쥐","코","소","새","해","배"]],["쥐","🐭",2,["귀","코","소","새","개","해","배"]],["도끼","🪓",2,["토끼","포도","지도","코끼리","오리","오이","고기"]],["키보드","⌨️",2,["케이크","코끼리","카메라","아보카도","거북이","피아노","도토리"]],["스쿠터","🛴",2,["파스타","마스크","스키","토마토","소시지","개구리","너구리"]],["아보카도","🥑",2,["오토바이","해바라기","카메라","키보드","포도","지도","도토리"]],["파스타","🍝",2,["마스크","스쿠터","바나나","토마토","피아노","카메라","소시지"]],["곰","🐻",3,["공","개","귀","코","소","손","뱀"]],["별","⭐",3,["불","발","배","뱀","달","물","말"]],["달","🌙",3,["발","말","별","불","물","산","꿀"]],["문","🚪",3,["물","문어","말","불","손","산","꿀"]],["공","⚽",3,["곰","공룡","공주","개","귀","코","소"]],["불","🔥",3,["별","발","배","물","뱀","꿀","달"]],["물","💧",3,["문","말","선물","불","꿀","별","달"]],["손","✋",3,["소","산","새","코","곰","문","공"]],["발","🦶",3,["별","불","배","달","말","뱀","물"]],["말","🐴",3,["물","양말","달","문","발","별","불"]],["산","⛰️",3,["손","우산","소","새","달","문","발"]],["뱀","🐍",3,["배","별","불","발","새","개","해"]],["꿀","🍯",3,["불","물","별","달","문","발","말"]],["빵","🍞",3,["달","공","발","말","산","코","소"]],["수박","🍉",3,["호박","사자","소파","사탕","가방","나비","새우"]],["우산","☂️",3,["우유","여우","새우","풍선","오리","오이","아기"]],["사탕","🍬",3,["사자","사과","사슴","기타","소파","하트","치타"]],["기린","🦒",3,["고기","기차","기타","고래","아기","구름","오리"]],["공룡","🦖",3,["공주","고래","기린","구름","오리","고추","고기"]],["로봇","🤖",3,["로켓","호박","레몬","나비","포도","수박","가방"]],["로켓","🚀",3,["로봇","쿠키","스키","라면","레몬","오리","모자"]],["버섯","🍄",3,["버스","바지","비누","우산","사슴","풍선","거미"]],["감자","🥔",3,["사자","상자","모자","피자","가지","공주","기차"]],["당근","🥕",3,["아기","사과","딸기","고기","하트","시계","도끼"]],["딸기","🍓",3,["아기","고기","기차","기타","사과","기린","나비"]],["연필","✏️",3,["오리","여우","오이","아기","양말","우유","소파"]],["문어","🐙",3,["상어","우유","모자","여우","오이","가위","키위"]],["상어","🦈",3,["상자","문어","새우","사자","가위","사과","우유"]],["상자","📦",3,["사자","감자","상어","모자","피자","바지","가지"]],["공주","👸",3,["공룡","고추","가지","감자","모자","고래","구두"]],["가방","🎒",3,["가위","가지","나비","기차","기타","수박","사탕"]],["양말","🧦",3,["하마","치마","우산","연필","선물","말","오리"]],["거울","🪞",3,["거미","가위","여우","구두","고추","새우","거북이"]],["사슴","🦌",3,["사자","사과","사탕","버스","새우","소파","하트"]],["구름","☁️",3,["구두","고래","기린","공룡","구급차","오리","기차"]],["호박","🎃",3,["수박","하마","로봇","가방","호랑이","나비","모자"]],["트럭","🚚",3,["하트","오리","토끼","고래","기린","구름","스키"]],["택시","🚕",3,["토끼","시계","개미","버스","소시지","나비","오리"]],["라면","🍜",3,["레몬","하마","나무","카메라","거미","개미","치마"]],["레몬","🍋",3,["라면","로봇","하마","나무","거미","개미","치마"]],["풍선","🎈",3,["우산","버섯","선물","피자","포도","버스","당근"]],["선물","🎁",3,["나무","거미","새우","양말","거울","풍선","물"]],["자동차","🚗",3,["소방차","구급차","자전거","라디오","바나나","카메라","파스타"]],["경찰차","🚓",3,["구급차","기차","소방차","강아지","고구마","코알라","바나나"]],["소방차","🚒",3,["자동차","소시지","경찰차","구급차","코알라","호랑이","기차"]],["구급차","🚑",3,["고구마","개구리","경찰차","너구리","자동차","소방차","기차"]],["자전거","🚲",3,["자동차","무지개","거북이","비행기","사자","바나나","카메라"]],["강아지","🐶",3,["피아노","소시지","가지","고양이","개구리","무지개","경찰차"]],["고양이","🐱",3,["거북이","호랑이","고구마","케이크","오이","강아지","오토바이"]],["호랑이","🐯",3,["고양이","거북이","오토바이","케이크","소방차","오이","토마토"]],["돌고래","🐬",3,["도토리","고구마","고래","개구리","너구리","코끼리","고양이"]],["헬리콥터","🚁",4,["롤러코스터","해바라기","아보카도","스쿠터","오토바이","코끼리","케이크"]],["다람쥐","🐿️",4,["강아지","호랑이","바나나","도토리","소시지","고릴라","지렁이"]],["무당벌레","🐞",4,["오토바이","해바라기","무지개","아보카도","헬리콥터","자동차","크레용"]],["고릴라","🦍",4,["코알라","고구마","카메라","고양이","돌고래","코끼리","개구리"]],["크레용","🖍️",4,["케이크","카메라","마스크","호랑이","지렁이","코끼리","라디오"]],["망원경","🔭",4,["경찰관","곰인형","무지개","경찰차","자전거","강아지","농구공"]],["신호등","🚦",4,["키보드","비행기","소시지","스쿠터","호랑이","피아노","도토리"]],["우체통","📮",4,["우주선","야구공","토마토","스쿠터","파스타","크레용","우유"]],["경찰관","👮",4,["경찰차","소방관","망원경","반창고","강아지","고릴라","농구공"]],["소방관","🧑‍🚒",4,["소방차","경찰관","소시지","비행기","호랑이","반창고","햄버거"]],["반창고","🩹",4,["비행기","물고기","바나나","고양이","경찰관","고구마","경찰차"]],["햄버거","🍔",4,["자전거","거북이","무지개","키보드","소방관","물고기","해바라기"]],["옥수수","🌽",4,["독수리","우주선","소시지","고구마","마스크","파스타","야구공"]],["도넛","🍩",4,["도끼","포도","지도","비누","로봇","로켓","버섯"]],["아이스크림","🍦",4,["케이크","롤러코스터","마스크","오토바이","아보카도","피아노","강아지"]],["롤러코스터","🎢",4,["헬리콥터","아이스크림","스쿠터","마스크","아보카도","코끼리","오토바이"]],["텐트","⛺",4,["하트","트럭","토끼","기타","치타","택시","낙타"]],["농구공","🏀",4,["너구리","고구마","개구리","구급차","물고기","돌고래","망원경"]],["야구공","⚾",4,["개구리","너구리","고구마","구급차","우체통","물고기","우주선"]],["운동화","👟",4,["자동차","목도리","오징어","라디오","우체통","반창고","옥수수"]],["장갑","🧤",4,["당근","아기","사과","딸기","상자","안경","달걀"]],["목도리","🧣",4,["도토리","독수리","코끼리","개구리","너구리","돌고래","물고기"]],["안경","👓",4,["아기","망원경","사과","당근","딸기","연필","장갑"]],["지렁이","🪱",4,["호랑이","부엉이","고양이","거북이","달팽이","소시지","비행기"]],["달팽이","🐌",4,["고양이","호랑이","지렁이","부엉이","거북이","비행기","도토리"]],["오징어","🦑",4,["라디오","고양이","호랑이","우주선","무지개","자전거","지렁이"]],["물고기","🐟",4,["고기","돌고래","고구마","무지개","딸기","비행기","반창고"]],["얼음","🧊",4,["우유","여우","오이","거울","오리","아기","가위"]],["달걀","🥚",4,["당근","딸기","아기","사과","장갑","안경","달"]],["눈사람","⛄",4,["너구리","독수리","코알라","카메라","파스타","다람쥐","바나나"]],["해적","🏴‍☠️",4,["호박","하마","모자","사자","피자","바지","치즈"]],["우주선","🛸",4,["우체통","옥수수","오징어","무지개","야구공","여우","스쿠터"]],["곰인형","🧸",4,["고양이","망원경","강아지","고릴라","고구마","코알라","케이크"]],["독수리","🦅",4,["도토리","옥수수","목도리","코끼리","개구리","너구리","돌고래"]],["부엉이","🦉",4,["고양이","지렁이","호랑이","거북이","케이크","달팽이","비행기"]],["낙타","🐪",4,["기타","치타","파스타","나비","나무","하트","사탕"]],["꿀벌","🐝",4,["수박","꿀","나비","로봇","문어","가방","호박"]],["닭","🐔",5,["달","발","말","산","빵","코","소"]],["꽃","🌸",5,["꽃게","꿀","코","소","곰","공","손"]],["옷","👕",5,["코","소","곰","공","손","꽃","새"]],["돼지","🐷",5,["바지","가지","소시지","지도","도끼","모자","사자"]],["의자","🪑",5,["왕자","모자","사자","피자","감자","상자","오리"]],["왕관","👑",5,["왕자","아기","당근","안경","펭귄","경찰관","사과"]],["병원","🏥",5,["망원경","여우","상어","우유","오이","바지","가위"]],["학교","🏫",5,["하마","아기","하트","사과","딸기","고기","시계"]],["원숭이","🐒",5,["거북이","고양이","호랑이","지렁이","달팽이","부엉이","옥수수"]],["펭귄","🐧",5,["당근","풍선","왕관","장갑","피자","아기","포도"]],["귤","🍊",5,["개","귀","곰","공","별","달","불"]],["괴물","👾",5,["선물","거미","개미","거울","나무","구두","고추"]],["뼈","🦴",5,["빵","코","소","새","개","해","배"]],["화산","🌋",5,["우산","하마","호박","하트","버스","버섯","사슴"]],["휴대폰","📱",5,["라디오","토마토","피아노","자동차","호랑이","우체통","햄버거"]],["컴퓨터","💻",5,["스쿠터","토마토","코끼리","카메라","케이크","키보드","파스타"]],["칫솔","🪥",5,["촛불","치즈","치마","치타","지도","버스","우산"]],["촛불","🕯️",5,["칫솔","로봇","호박","꿀벌","불","나비","치즈"]],["태권도","🥋",5,["토마토","개구리","도토리","아보카도","너구리","고구마","키보드"]],["왕자","🤴",5,["의자","상자","모자","사자","피자","감자","왕관"]],["앵무새","🦜",5,["옥수수","무지개","우주선","토마토","개구리","카메라","야구공"]],["꽃게","🦀",5,["고기","아기","사과","시계","딸기","학교","꽃"]]].map(([word, emoji, level, cand]) => ({word, emoji, level, cand}));
+const EN_WORDS = [["cat","🐱",1,["bat","rat","car","hat","ant","cow","van"],"고양이"],["dog","🐶",1,["pig","cow","fox","bug","bag","box","egg"],"강아지"],["pig","🐷",1,["pie","dog","bug","bag","pen","pan","egg"],"돼지"],["cow","🐄",1,["cat","dog","fox","car","box","cup","toy"],"소"],["hen","🐔",1,["pen","net","bee","van","sun","hat","bed"],"암탉"],["fox","🦊",1,["box","dog","cow","toy","foot","fork","frog"],"여우"],["owl","🦉",1,["wolf","ball","bell","cow","dog","fox","box"],"부엉이"],["bee","🐝",1,["bed","web","hen","bat","bug","bus","bag"],"벌"],["ant","🐜",1,["cat","bat","rat","hat","net","hand","van"],"개미"],["bat","🦇",1,["cat","rat","hat","bag","ant","bee","bug"],"박쥐"],["bug","🐛",1,["bus","bag","dog","pig","bee","bat","sun"],"벌레"],["rat","🐀",1,["cat","bat","hat","ant","car","ear","van"],"쥐"],["ox","🐂",1,["fox","box","owl","dog","toy","frog","lion"],"황소"],["bus","🚌",1,["bug","sun","bee","bat","bag","box","cup"],"버스"],["car","🚗",1,["cat","ear","rat","cow","bat","hat","bag"],"자동차"],["van","🚐",1,["pan","cat","hen","bat","rat","sun","hat"],"승합차"],["sun","☀️",1,["bus","hen","bug","van","cup","pen","pan"],"해"],["hat","🎩",1,["cat","bat","rat","ant","hen","car","van"],"모자"],["bag","🎒",1,["bat","bug","cat","dog","pig","bee","rat"],"가방"],["box","📦",1,["fox","dog","cow","bee","bat","bug","bus"],"상자"],["cup","🥤",1,["cat","cow","bug","bus","car","sun","map"],"컵"],["bed","🛏️",1,["bee","web","hen","bat","bug","bus","bag"],"침대"],["pen","🖊️",1,["hen","pan","pie","net","pig","bee","van"],"펜"],["map","🗺️",1,["pan","cat","bat","rat","car","van","hat"],"지도"],["pan","🍳",1,["van","pen","map","cat","pig","hen","bat"],"프라이팬"],["egg","🥚",1,["leg","dog","pig","bug","bag","ear","eye"],"달걀"],["leg","🦵",1,["egg","dog","pig","hen","bee","bug","bag"],"다리"],["pie","🥧",1,["pig","pen","bee","pan","eye","kite","bike"],"파이"],["key","🔑",1,["hen","bee","bed","pen","leg","web","net"],"열쇠"],["ear","👂",1,["car","rat","cat","bat","van","hat","bag"],"귀"],["eye","👁️",1,["bee","egg","pie","ear","deer","tree","key"],"눈"],["web","🕸️",1,["bee","bed","hen","pen","leg","key","net"],"거미줄"],["net","🥅",1,["hen","ant","pen","cat","bee","bat","rat"],"그물"],["toy","🧸",1,["dog","cow","fox","box","key","foot","book"],"장난감"],["fish","🐟",2,["gift","frog","lion","bird","milk","ring","king"],"물고기"],["frog","🐸",2,["foot","fork","door","ring","fish","lion","crab"],"개구리"],["duck","🦆",2,["sock","rock","dice","drum","deer","milk","book"],"오리"],["bear","🐻",2,["pear","deer","seal","bell","boat","star","leaf"],"곰"],["lion","🦁",2,["moon","milk","corn","ring","king","rain","fish"],"사자"],["bird","🐦",2,["bike","bear","ring","dice","fish","lion","worm"],"새"],["crab","🦀",2,["coat","bear","cake","corn","pear","boat","star"],"게"],["goat","🐐",2,["boat","coat","gift","foot","star","sofa","bear"],"염소"],["deer","🦌",2,["bear","pear","door","drum","tree","dice","duck"],"사슴"],["wolf","🐺",2,["worm","foot","leaf","fork","sofa","goat","milk"],"늑대"],["seal","🦭",2,["leaf","bear","pear","bell","star","ball","sofa"],"물개"],["worm","🪱",2,["wolf","corn","fork","door","drum","moon","rose"],"지렁이"],["milk","🥛",2,["lion","king","kite","bike","fish","duck","bird"],"우유"],["cake","🎂",2,["bike","crab","kite","coat","dice","corn","ball"],"케이크"],["corn","🌽",2,["worm","moon","coat","fork","rock","lion","crab"],"옥수수"],["pear","🍐",2,["bear","deer","seal","star","leaf","crab","goat"],"배"],["ball","⚽",2,["bell","bear","seal","boat","bird","wolf","milk"],"공"],["bell","🔔",2,["ball","bear","seal","bike","bone","leaf","bird"],"종"],["book","📖",2,["boat","sock","bone","rock","fork","door","moon"],"책"],["door","🚪",2,["deer","book","moon","foot","frog","worm","corn"],"문"],["ring","💍",2,["king","rain","frog","lion","bird","gift","fish"],"반지"],["king","🤴",2,["ring","kite","lion","milk","gift","bike","fish"],"왕"],["gift","🎁",2,["goat","fish","ring","king","kite","foot","lion"],"선물"],["drum","🥁",2,["duck","deer","worm","door","frog","crab","tree"],"북"],["kite","🪁",2,["bike","king","dice","milk","cake","gift","tree"],"연"],["bike","🚲",2,["kite","bird","cake","bone","dice","bear","milk"],"자전거"],["boat","⛵",2,["goat","coat","bear","book","foot","bone","crab"],"보트"],["moon","🌙",2,["lion","corn","book","door","foot","worm","nose"],"달"],["star","⭐",2,["bear","seal","pear","crab","goat","boat","coat"],"별"],["tree","🌳",2,["deer","kite","rose","frog","crab","cake","drum"],"나무"],["rain","🌧️",2,["ring","lion","corn","hand","taxi","cake","ball"],"비"],["rose","🌹",2,["nose","bone","rock","worm","corn","door","tree"],"장미"],["sock","🧦",2,["rock","duck","book","fork","sofa","corn","rose"],"양말"],["coat","🧥",2,["goat","boat","crab","corn","foot","cake","star"],"외투"],["hand","✋",2,["rain","bird","cake","ball","ring","king","bone"],"손"],["foot","🦶",2,["frog","goat","boat","coat","fork","book","door"],"발"],["nose","👃",2,["rose","bone","corn","moon","sock","sofa","fish"],"코"],["bone","🦴",2,["nose","book","bike","boat","rose","bear","corn"],"뼈"],["rock","🪨",2,["sock","fork","duck","book","rose","corn","worm"],"바위"],["leaf","🍃",2,["seal","bear","pear","wolf","bell","lion","crab"],"나뭇잎"],["dice","🎲",2,["duck","kite","bike","bird","deer","cake","fish"],"주사위"],["fork","🍴",2,["rock","worm","corn","book","sock","foot","frog"],"포크"],["taxi","🚕",2,["rain","cake","ball","tree","hand","goat","gift"],"택시"],["sofa","🛋️",2,["sock","goat","wolf","seal","boat","star","rose"],"소파"],["ship","🚢",3,["shoe","shirt","sheep","seal","star","rain","sock"],"배"],["sheep","🐑",3,["shark","shirt","cheese","shoe","ship","whale","snake"],"양"],["shoe","👟",3,["ship","snow","rose","nose","sheep","seal","sock"],"신발"],["shark","🦈",3,["shirt","chair","snake","sheep","chick","whale","snail"],"상어"],["shirt","👕",3,["shark","sheep","chick","ship","chair","thumb","snail"],"셔츠"],["chick","🐥",3,["clock","chair","shark","shirt","truck","sheep","thumb"],"병아리"],["cheese","🧀",3,["cherry","sheep","shoe","cake","tree","rose","nose"],"치즈"],["cherry","🍒",3,["cheese","chair","shark","shirt","sheep","chick","deer"],"체리"],["chair","🪑",3,["shark","chick","train","whale","snail","shirt","cherry"],"의자"],["thumb","👍",3,["truck","shirt","sheep","shark","chick","chair","whale"],"엄지"],["whale","🐳",3,["plane","shark","chair","snake","grape","sheep","snail"],"고래"],["train","🚂",3,["chair","snail","truck","crown","grape","rain","taxi"],"기차"],["truck","🚚",3,["chick","thumb","train","clock","shark","crown","grape"],"트럭"],["snake","🐍",3,["snail","shark","plane","whale","grape","sheep","train"],"뱀"],["snail","🐌",3,["snake","train","shark","chair","plane","seal","shirt"],"달팽이"],["sled","🛷",3,["seal","deer","shoe","bird","star","tree","sock"],"썰매"],["clock","⏰",3,["cloud","chick","truck","crown","glove","shark","chair"],"시계"],["cloud","☁️",3,["clock","crown","glove","chick","chair","plane","spoon"],"구름"],["plane","✈️",3,["whale","snake","grape","glove","snail","train","shark"],"비행기"],["crown","👑",3,["train","clock","cloud","spoon","corn","chair","truck"],"왕관"],["flag","🚩",3,["frog","leaf","goat","seal","fish","bear","crab"],"깃발"],["glove","🧤",3,["clock","cloud","plane","grape","whale","snake","crown"],"장갑"],["grape","🍇",3,["plane","whale","train","snake","glove","bread","shark"],"포도"],["spoon","🥄",3,["crown","moon","sheep","snake","snail","snow","shoe"],"숟가락"],["snow","❄️",3,["shoe","lion","moon","sock","sofa","spoon","frog"],"눈"],["bread","🍞",3,["grape","bear","train","sheep","truck","cloud","crown"],"빵"],["apple","🍎",4,["whale","plane","grape","snake","glove","koala","spoon"],"사과"],["horse","🐴",4,["house","mouse","heart","rose","whale","snake","glove"],"말"],["mouse","🐭",4,["house","horse","melon","monkey","thumb","snake","glove"],"생쥐"],["tiger","🐯",4,["water","train","tree","chair","truck","sheep","thumb"],"호랑이"],["zebra","🦓",4,["heart","shark","robot","pizza","shirt","lemon","melon"],"얼룩말"],["robot","🤖",4,["donut","rabbit","shirt","horse","zebra","rocket","heart"],"로봇"],["pizza","🍕",4,["panda","plane","zebra","tiger","koala","pirate","spider"],"피자"],["lemon","🍋",4,["melon","spoon","camel","crown","lion","train","zebra"],"레몬"],["melon","🍈",4,["lemon","spoon","mouse","crown","moon","train","zebra"],"멜론"],["banana","🍌",4,["hand","rabbit","monkey","pirate","castle","carrot","potato"],"바나나"],["rabbit","🐰",4,["carrot","rocket","robot","banana","castle","cookie","rain"],"토끼"],["monkey","🐵",4,["rocket","cookie","mouse","cherry","snake","police","banana"],"원숭이"],["turtle","🐢",4,["castle","pirate","police","carrot","cheese","cookie","truck"],"거북이"],["rocket","🚀",4,["monkey","cookie","rabbit","rock","carrot","police","robot"],"로켓"],["police","👮",4,["cookie","pirate","potato","rocket","castle","cheese","monkey"],"경찰"],["pirate","🏴‍☠️",4,["potato","turtle","police","castle","carrot","cookie","cheese"],"해적"],["dragon","🐉",4,["carrot","train","frog","grape","crown","spoon","robot"],"용"],["castle","🏰",4,["turtle","cheese","carrot","cookie","camel","police","pirate"],"성"],["carrot","🥕",4,["rabbit","castle","cherry","rocket","pirate","dragon","turtle"],"당근"],["potato","🥔",4,["pirate","police","rocket","banana","monkey","cookie","robot"],"감자"],["cookie","🍪",4,["rocket","police","monkey","cheese","castle","cherry","pirate"],"쿠키"],["donut","🍩",4,["robot","cloud","mouse","candy","panda","house","shirt"],"도넛"],["candy","🍬",4,["panda","camel","hand","chair","cloud","crown","donut"],"사탕"],["water","💧",4,["tiger","camel","whale","chair","sheep","candy","panda"],"물"],["panda","🐼",4,["candy","pizza","hand","plane","donut","zebra","banana"],"판다"],["koala","🐨",4,["whale","shark","snake","snail","plane","apple","chair"],"코알라"],["camel","🐪",4,["candy","water","castle","cake","lemon","chair","snail"],"낙타"],["spider","🕷️",4,["rocket","monkey","tiger","sled","shirt","sheep","snake"],"거미"],["house","🏠",4,["horse","mouse","thumb","whale","snake","glove","donut"],"집"],["heart","❤️",4,["shark","shirt","zebra","cherry","bear","pear","chair"],"하트"],["juice","🧃",4,["chick","truck","mouse","house","shirt","whale","snake"],"주스"],["octopus","🐙",5,["dinosaur","cookie","robot","donut","popcorn","monster","unicorn"],"문어"],["penguin","🐧",5,["pumpkin","dolphin","popcorn","pencil","unicorn","monster","balloon"],"펭귄"],["dolphin","🐬",5,["pumpkin","penguin","popcorn","balloon","elephant","unicorn","gorilla"],"돌고래"],["giraffe","🦒",5,["gorilla","pirate","cupcake","gift","turtle","dragon","grape"],"기린"],["elephant","🐘",5,["hospital","dolphin","plane","dinosaur","banana","penguin","pumpkin"],"코끼리"],["dinosaur","🦕",5,["sandwich","kangaroo","elephant","snowman","banana","donut","octopus"],"공룡"],["rainbow","🌈",5,["balloon","rain","unicorn","rabbit","robot","kangaroo","banana"],"무지개"],["umbrella","☂️",5,["gorilla","zebra","burger","cherry","elephant","dinosaur","banana"],"우산"],["sandwich","🥪",5,["kangaroo","dinosaur","snowman","candy","panda","penguin","hand"],"샌드위치"],["popcorn","🍿",5,["unicorn","dolphin","penguin","pumpkin","balloon","cupcake","corn"],"팝콘"],["burger","🍔",5,["turtle","spider","rocket","pirate","dragon","banana","monkey"],"햄버거"],["pumpkin","🎃",5,["penguin","dolphin","popcorn","unicorn","cupcake","snowman","balloon"],"호박"],["balloon","🎈",5,["rainbow","dolphin","popcorn","unicorn","ball","snowman","dragon"],"풍선"],["pencil","✏️",5,["penguin","police","pirate","cookie","monkey","banana","rabbit"],"연필"],["crayon","🖍️",5,["dragon","carrot","cherry","crown","train","castle","cookie"],"크레용"],["monster","👾",5,["monkey","popcorn","penguin","dolphin","gorilla","mouse","castle"],"괴물"],["unicorn","🦄",5,["popcorn","balloon","snowman","rainbow","penguin","dolphin","pumpkin"],"유니콘"],["gorilla","🦍",5,["giraffe","umbrella","dolphin","hospital","popcorn","monster","turtle"],"고릴라"],["kangaroo","🦘",5,["sandwich","dinosaur","panda","dragon","carrot","rainbow","penguin"],"캥거루"],["snowman","⛄",5,["unicorn","snow","balloon","dolphin","dinosaur","sandwich","popcorn"],"눈사람"],["cupcake","🧁",5,["popcorn","pumpkin","giraffe","unicorn","juice","snake","plane"],"컵케이크"],["hospital","🏥",5,["elephant","gorilla","dolphin","spider","monster","popcorn","rabbit"],"병원"]].map(([word, emoji, level, cand, mean]) => ({word, emoji, level, cand, mean}));
+const EMOJI = {ko:{}, en:{}};
+KO_WORDS.forEach(w => { EMOJI.ko[w.word] = w.emoji; });
+EN_WORDS.forEach(w => { EMOJI.en[w.word] = w.emoji; });
+const LEVELS = 5;
+
+/* 모형 완성 칭찬 (녹음된 목소리와 같은 순서) */
+const PRAISE = {
+  ko:["우와아! 세현아! 너무 너무 잘했어!","세현아, 대단하다! 이렇게 잘하다니, 깜짝 놀랐어!","와아, 우리 세현이 최고야! 짝짝짝!","세현아, 해냈구나! 정말 멋져!","우와, 세현이 진짜 천재다! 완전 멋지다!"],
+  en:["Wow! You did great, Sehyun!","I'm so proud of you, Sehyun!","Awesome job, Sehyun! High five!","Sehyun, you're a superstar!","Yay, Sehyun! Way to go!"],
+};
+const LANGS = {
+  ko:{words:KO_WORDS, voice:/^ko/i, speechLang:'ko-KR', hint:'맞는 낱말 카드를 콕!', logo:['한','글','카','드'], name:'한글 카드 대작전'},
+  en:{words:EN_WORDS, voice:/^en/i, speechLang:'en-US', hint:'맞는 영어 카드를 콕!', logo:['A','B','C'], name:'영어 카드 대작전'},
+};
+
+/* 모형 75가지 (글자 하나 = 블록 한 칸) */
+const MODELS = [
+ {id:"police",name:"경찰차",art:["......RRBB......",".....KKKKKK.....","....KLLKKLLK....","..WWWWWWWWWWWW..",".WWWBBBBBBBBWWW.","YWWWWWWWWWWWWWWR","KKKEEEKKKKEEEKKK","...ESE....ESE...","...EEE....EEE..."]},
+ {id:"police_officer",name:"경찰관",art:["....VVVV....","...VVAAVV...","..KKKKKKKK..","..FFFFFFFF..","..FFKFFKFF..","..FMFFFFMF..","..FKFFFFKF..","...FKKKKF...","..LLLVVLLL..",".LLALVVLLLL.",".LLLLVVLLLL.",".FKKKAKKKKF.","..VVVVVVVV..","..VVV..VVV..",".KKKK..KKKK."]},
+ {id:"police_heli",name:"경찰 헬기",art:["KKKKKKKKKKKKKKK...",".......E..........",".....BBBBBBB....S.","...BBLLBBBBBB...S.","..BLLLLBBBBBBBBBBB",".BLLLLLWWWWWBBB.S.",".WWWWWWWWWWWW...S.","..BBBBBBBBBB......","....E....E........","..EEEEEEEEEEE....."]},
+ {id:"cg_ship",name:"해경 경비함",art:["..........K.......",".........KKK......","..........K.......","........SSSSSS....","........SLLLLLS...",".....SSSSSSSSSSS..",".....SESESESSSSS..",".WWWWWWWWWWWWWWWWW","WWWWWWWWWWBBRRWWW.",".WWWWWWWWBBRRWWWW.","..KKKKKKKKKKKKKK..","BBBBBBBBBBBBBBBBBB"]},
+ {id:"cg_boat",name:"해경 고속정",art:[".......RB.........",".......KK.........","......KWLL........",".....KWWLLL....OO.","..WWWWWWWWWWWWOOOO","..OOOOOOOOOOOOOOO.","W..OOOOOOOOOOOOO.W",".W..WWWWWWWWWWW.W.","WWWWBBBBBBBBBBWWWB"]},
+ {id:"cg_heli",name:"해경 헬기",art:["KKKKKKKKKKKKKKKK..","........E.........",".....WWWWWWWW.....","...WWLLWWWWWWWW.O.","..WLLLLWWWWWWWWWWW",".WLLLLWWWWWWWWW.O.",".OOOOOOOOOOOOO....",".RRRRRRRRRRRR.....","..WWWWWWWWWW......","..K.....K.....K...",".KK.....K....KK...","........F.........",".......OOO........","........O.........",".......O.O........"]},
+ {id:"spidey_kid",name:"스파이디",art:["....RRRRRR....","..RRKRRRRKRR..",".RRKRRRRRRKRR.","RKKKKRRRRKKKKR","RKWWWKRRKWWWKR","RKWWWWKKWWWWKR","RKWWWWKKWWWWKR","RRKWWKRRKWWKRR","RRRKKRRRRKKRRR",".RRKRRKKRRKRR.","...RRRRRRRR...","RRBRRRKKRRRBRR","..BRRKRRKRRB..","..BBBB..BBBB..",".RRRR....RRRR."]},
+ {id:"spin",name:"스핀",art:["....KKKKKK....","..KKRKKKKRKK..",".KKRKKKKKKRKK.","KRRKKKKKKKKRRK","KKWWWKKKKWWWKK","KKWWWWKKWWWWKK","KKWWWWKKWWWWKK","KRKWWKRRKWWKRK","KKRKKRKKRKKRKK",".KKRKKRRKKRKK.","...KKKKKKKK...","KKEKKKRRKKKEKK","..EKKRRRRKKE..","..KKKR..RKKK..",".RRRK....KRRR."]},
+ {id:"ghost_spider",name:"고스트 스파이더",art:["....MMMMMM....","..MMMMMMMMMM..",".MMMMMMMMMMMM.","MMMWWWWWWWWMMM","MMKKKWWWWKKKMM","MKWWWKWWKWWWKM","MKWWWKWWKWWWKM","MMKWWKWWKWWKMM","MMWKKWWWWKKWMM",".MMWWWWWWWWMM.","..PMMWWWWMMP..","MKKWWWKKWWWKKM","..KWWKWWKWWK..","..KMKK..KKMK..",".MMMM....MMMM."]},
+ {id:"barnacles",name:"바나클 대장",art:[".....VVVVVV.....","....VVVAAVVV....",".EE.VVVAAVVV.EE.","EWIEVVVVVVVVEIWE","EWWEKKKKKKKKEWWE",".EWWWWWWWWWWWWE.","EWWWWKWWWWKWWWWE","EWWWWKWWWWKWWWWE","EWWWWWKKKKWWWWWE",".EWWWWWKKWWWWWE.",".EWWKWWWWWWKWWE.","..EWWKKKKKKWWE..","..VBBBBBBBBBBV..",".VBBYYBBBBBBBBV.","EWWBYYBBBBBBBWWE","...EWWWE.EWWWE.."]},
+ {id:"kwazii",name:"콰지",art:[".O..........O.",".OO........OO.",".OIOOOKNONOIO.","OOOOOKOOOOOOOO","OOKKKOOOOWKOON","NOKKKOOOOKKOOO","OOOOOOOMMOOOON","NOOKWWWWWWKOOO",".OOOKKKKKKOOO.","..OOOOOOOOOO..","...BBBBBBBB...","..BBBBBYBBBB..",".OBBBBBBBBBBO."]},
+ {id:"peso",name:"페소",art:["....KKKKK.......","...KKKKKKK......","..KKWWWWWKK.....","..KWWKWKWWK.....","..KWWOOOWWK.....","..KKWWOWWKK.....",".KKKWWWWWKKKSSS.","KK.KWWWWWKKKS.S.","K..KWWWWWKKWWWWW","...KWWWWWKKWWRWW","...KWWWWWKKWRRRW","...KKWWWKK.WWRWW","....KKKKK..WWWWW","...OOO.OOO......"]},
+ {id:"pikachu",name:"피카츄",art:["K..........K......","KK........KK....YY",".KY......YK....YYY",".YY......YY...YYY.",".YYYYYYYYYY..YYY..","YYKWYYYYKWYY.YYYYY","YYKKYYYYKKYY...YY.","RRYYKYYKYYRR..YY..","YYYYYKKYYYYY.YY...","..YYYYYYYY..NN....",".YYAYYYYAYYN......",".YYYYYYYYYY.......","..YYYYYYYY........",".YYYY..YYYY......."]},
+ {id:"charmander",name:"파이리",art:["..OOOO..........",".OOOOOO......R..","OOOOOOOO....RYR.","OKWOOKWO....RYR.","OKKOOKKO.....O..","OOKOOKOO.....O..",".OOKKOO.....OO..","..OOOO.....OO...","OOOFFFFOO..O....","..OFFFFO..OO....",".OOFFFFOOOO.....",".OOFFFFOOO......","..OO..OO........",".OOO.OOO........"]},
+ {id:"squirtle",name:"꼬부기",art:["...BBBBB........",".BBLLLLLBB......","BLLLLLLLLLB.....","BLKWLLLKWLB.....","BLKKLLLKKLB.....","BLLLKLKLLLB.....",".BLLLKLLLB......","..BNNNNNB.......","BLNFFFFFNLB.....","B.NFFFFFN.B.LLL.","..NFFFFFN..LBBBL","..NFFFFFN..BLLBL","..NNNNNNNLLLLLL.","..BLL.LLB.......",".BLLL.LLLB......"]},
+ {id:"plane",name:"여객기",art:["..............RR",".............RRR","............RRRR","..WWWWWWWWWWWWWR",".LLWLWLWLWLWLWWW","WWWWWWWWWWWWWWW.",".WWWWBBBBBBWWW..",".....BBBBBB.....","....K......K....","...KKK....KKK..."]},
+ {id:"jet",name:"제트기",art:[".......BB.......",".......BB.......","......BLLB......","......BLLB......","......BBBB......",".....BBBBBB.....","...BBBBBBBBBB...",".BBBBBBBBBBBBBB.","BBBBBBBBBBBBBBBB","......BBBB......",".....BBBBBB.....","....BB.OO.BB....",".......OO......."]},
+ {id:"seaplane",name:"수상비행기",art:["......YYYYYYYYYY..","........K....K....",".Y......YYYYYY...E",".YY..YYYYYYLLLYYYE",".YYYYYYYYYYYYYYYYY","...YYYYYYYYYYYYY.E",".......K....K.....","....WWWWWWWWWWWW..",".....EEEEEEEEEEWW.","BBBBBBBBBBBBBBBBBB"]},
+ {id:"spidey",name:"스파이더맨",art:["....RRRRR....","...RRRKRRR...","..RRRRKRRRR..","..RWWRKRWWR..","..KWWWKWWWK..","..RKWWKWWKR..","...RRRKRRR...","..BRRRRRRRB..",".BBBRKRKRBBB.",".BBBRRKRRBBB.",".RR.RKRKR.RR.","....BBBBB....","...BBB.BBB...","...BB...BB...","..RRR...RRR.."]},
+ {id:"spidey_face",name:"스파이더맨 얼굴",art:["......RRKRR......","....RRRRKRRRR....","...RKRRRKRRRKR...","..RRKRRRKRRRKRR..",".RRRRKKKKKKKRRRR.",".RKKRRRRKRRRRKKR.","RKWWKKRRKRRKKWWKR","KWWWWWKRKRKWWWWWK","KWWWWWWKRKWWWWWWK","RKWWWWWKRKWWWWWKR","RRKWWWKRKRKWWWKRR",".RRKKKRRKRRKKKRR.",".RKRRRKKKKKRRRKR.","..RRKRRRKRRRKRR..","....RRRRKRRRR...."]},
+ {id:"spidey_car",name:"스파이더 자동차",art:[".......RRRRRR.....","......RLLLRLLR....",".....RLLLLRLLLR...",".RRRRRRWWWWWRRRRR.","RKRRRRWKWKWKWRRKRY","RRKRRRWWKKKWWRKRRR","BBBKBBWKWKWKWBBKBB","BKKKBBBWWWWWBBKKKB",".KSK..........KSK.",".KKK..........KKK."]},
+ {id:"sub",name:"노란 잠수함",art:[".......SS.......",".......S........","......YYYY......","...YYYYYYYYYY...",".YYYLYYLYYLYYY..","YYYYYYYYYYYYYYYS",".YYYYYYYYYYYYYS.","...YYYYYYYYY..S."]},
+ {id:"black_sub",name:"큰 잠수함",art:[".........KK.......",".........K........",".......EEEEE......","......KEEEEEK.....",".E.....EEEEE......",".EE..EEEEEEEEEEEE.","SEEEEEEEEEEEEEEEEE","SEEEEEEEEEEEEEEEEE",".EE..KKKKKKKKKKKK.",".E................"]},
+ {id:"shark",name:"상어",art:[".......B........","......BB........",".....BBB.......B","..BBBBBBBBBBB.BB",".BKBBBBBBBBBBBBB","BBBBBBBBBBBBBB.B",".WWWWWWWWBBB...B","..WWWWW.B......."]},
+ {id:"peppa",name:"페파",art:["...I.I.....III..","...IIII...IIIIII","..IIIIIWKWKIIIIM",".IIIIIIIIIIIIIII",".IIIIIIIIIIIIIIM","IIIIIIIIIIIIII..","IIMMIIIIIIKI....","IIMMIIIIKKI.....",".IIIIIIIII......","....RRRR........","...RRRRRR.......","..IRRRRRRI......","..RRRRRRRR......","...I....I.......","..KK...KK......."]},
+ {id:"george",name:"조지",art:["..I.I...III.....","..IIII.IIIII....",".IIIIWKWKIIM....","IIIIIIIIIIII....","IIIIIIIIIIIM....","IMMIIIIIKI......","IMMIIIKKI....GG.",".IIIIIII....GWKG","..IIIII.....GGGG","...BBBB....GGH..","..BBBBBBIIGGHH..","..BBBBBB..DGGH..","...I..I....GGG..","..KK.KK....G.G.."]},
+ {id:"mr_dino",name:"공룡 인형",art:[".........GGGG...","........GGGGGG..",".......DGWKGGGG.",".......DGGGGGGGG","......DGGGGKKGG.",".....DGGGGGGG...","...D.GGHHHGG....",".DGGGGGHHHHG....","DGGGGGGHHHHG....",".....GGHHHGGG...",".....GG...GG....","....GGG..GGG...."]},
+ {id:"heli",name:"구조 헬기",art:["KKKKKKKKKKKKK...","......K.........","....OOOOO.......","...OLLLOOO......","..OLLLLOOOOOOOOO","..OOOOOOOO....OO","...OOOOOO......O","....K...K.......","..KKKKKKKKK....."]},
+ {id:"fire_heli",name:"소방 헬기",art:["KKKKKKKKKKKKKKK...",".......E..........","....RRRRRRR.....R.","..RRRLLRRRRRRRRRR.",".RRLLLLRRRRRRRRRRR","RRRLLLRRRRRRR...R.",".RRRRRRRRRR.......","..EE.....EE.......","..EEEEEEEEEE......","......K...........","......K...........",".....SSS..........",".....OOO..........","......O..........."]},
+ {id:"chinook",name:"수송 헬기",art:["KKKKKKK....KKKKKKK","...E..........E...","..GGG........GGG..","..GGGGGGGGGGGGGGG.",".LLGGGLGGLGGLGGGG.","LLLGGGGGGGGGGGGGG.","GGGGGGGGGGGGGGGGG.",".DDDDDDDDDDDDDDD..","..K..K.......K....",".KKK.KK.....KKK..."]},
+ {id:"carbot_ace",name:"에이스 레스큐 X",art:[".S.S....YY........",".SWS..CRYYRC......",".S.S.CRRRRRRC.....",".SWS.CLLLLLLC.....",".S.S.CLWLLWLC.....",".SWS.CRSSSSRC.....",".S.S..CSSSSC......","CRRRRCRRRRRRCRRRRC","CWWWWCLLLLLLCWWWWC","CRRRRCLLLLLLCRRRRC",".KSK.YRSSSSRY.SSSE",".KSK.RRSSSSRR.SSSE",".RRR.CCCCCCCC.KSK.","....CRRR..RRRC....","....KSKR..RKSK....","...RRRRR..RRRRR..."]},
+ {id:"carbot_fron",name:"프론 폴리스 X",art:["......RRWBB......",".....VBBBBBV.....","....VBBBYBBBV....","....VLLLLLLLV....","....VWWSSSWWV....",".....VVWWWVV.....","VBBBBVWWWWWVBBBBV","BKKKBWWLLLWWBKKKB","BKSKBYYLLLYYBKSKB","BKKKBWWWWWWWBKKKB","WSSSWBWYYYWB.VWV.","WBYBW.BBBBB..VWV.","WYYYW.BWWWB..VBV.","WBYBW.BBVBB......",".WBW.VWWVWWV.....","....VBBBVBBBV...."]},
+ {id:"carbot_penta",name:"펜타스톰 X",art:["AA......AA......AA",".AA....VAAV....AA.",".AAA.VVVVVVVV.AAA.","..AAAVLLLLLLVAAA..","...AAVLWLLWLVAA...","....AVSSSSSSVA....","RRRRVVVAAAAVVVBBBB","RWWRVALLLLLLAVBWWB","RRRRVAVLLLLVAVBBBB","CRRCVVYVVVVYVVWBBW","RRRRVAAAAAAAAVWWWW","RSSR.VVVVVVVV.BWWB","KKKKWWWW..WWWWKKKK","..KKKOOO..OOOKKK..","..KSKWWW..WWWKSK..","..OOOOOO..OOOOOO.."]},
+ {id:"ironman",name:"아이언맨",art:["....RRRRR....","...RRRRRRR...","...RAAAAAR...","...RWWAWWR...","...RAAAAAR...","....RAKAR....","..RRRRRRRRR..",".AARRRLRRRAA.",".AARRLWLRRAA.",".AARRRLRRRAA.",".RR.RRRRR.RR.","...RRAAARR...","...AAA.AAA...","...RRR.RRR...","..RRRR.RRRR.."]},
+ {id:"ironman_helmet",name:"아이언맨 헬멧",art:["....RRRRRR....","..RRRRAARRRR..",".RRRRAAAARRRR.",".RRRAAAAAARRR.","RRRAAAAAAAARRR","RRALWWAAWWLARR","RRAKLLAALLKARR","RRAAAAAAAAAARR","RRRAAAAAAAARRR",".RRAKKKKKKARR.",".RRAAAAAAAARR.","..RRAAAAAARR..","...RRAAAARR...","....RRRRRR...."]},
+ {id:"ironman_fly",name:"날아가는 아이언맨",art:["............RRR...","...........RRRAA..","...........RRALA..","...........RRRAA..","......RRRRRRRR....",".OORRAAARRRRRAAAAR","YYORRAAARRRRRAAAAR",".OORRAAARRLLR....."]},
+ {id:"mario",name:"마리오",art:["....RRRRRR....","...RRRWWRRR...","..RRRWRRWRRR..","..RRRRWWRRRR..",".CCCCCCCCCCCC.",".NNFKWFFKWFNN.",".NFFKKFFKKFFN.","FNFFFFFFFFFFNF","..KKKFFFFKKK..","..KKKKKKKKKK..","..RRBRRRRBRR..","WRRRBYBBYBRRRW","W..BBBBBBBB..W","..NNNN..NNNN.."]},
+ {id:"luigi",name:"루이지",art:["...GGGGGG...","..GGGWWGGG..",".GGGWGGWGGG.",".GGGGWWGGGG.","DDDDDDDDDDDD","NNFKWFFKWFNN","NFFKKFFKKFFN","FFFFFFFFFFFF","KKFFFFFFFFKK",".KKKFFFFKKK.","..FKKKKKKF..","WGGBGGGGBGGW","WGGBYBBYBGGW",".BBBB..BBBB.","NNNN....NNNN"]},
+ {id:"yoshi",name:"요시",art:["...KKK..........","..KWWKK.........","..KWWKK..GGGG...","..GKWWGGGGGGGGG.",".RGGGGGGGGGGGGKG","RRGGGGGGGGGGGGGG",".RGGGGGGGGGGGGGG","..GGGGWWWWWWGGG.","...GGWWWWWWWW...","...GGWWWWW......","..WRRRWWWWGG....",".WRRRRWWWWGG....","GGGGGGWWWW......","..OOOO.OOO......",".OOOOO.OOOO....."]},
+ {id:"pirate",name:"해적선",art:[".......KK.......",".......N........","....WWWWWWW.....","....WWKWKWW.....","....WWWKWWW.....","....WWKWKWW.....",".......N........","NNNNNNNNNNNNNNNN",".NNYNNYNNYNNYNN.","..NNNNNNNNNNNN..","BBBBBBBBBBBBBBBB"]},
+ {id:"sail",name:"돛단배",art:[".......R........",".......WW.......",".......WRR......",".......WWWW.....",".......WRRRR....",".......WWWWWW...",".......WRRRRRR..",".......N........","NNNNNNNNNNNNNNNN",".NNWNNWNNWNNNNN.","..NNNNNNNNNNNN..","BBBBBBBBBBBBBBBB"]},
+ {id:"cruise",name:"여객선",art:[".......KK..KK.....",".......RR..RR.....",".......RR..RR.....",".....WWWWWWWWWW...","....WBWBWBWBWBWW..","...WWWWWWWWWWWWWW.","..WBWBWBWBWBWBWBW.",".WWWWWWWWWWWWWWWWW","RRRRRRRRRRRRRRRRRR",".VLVLVLVLVLVLVLVV.","..VVVVVVVVVVVVVV..","BBBBBBBBBBBBBBBBBB"]},
+ {id:"martin",name:"마틴",art:["...AYYYYYA....","..AYYYYYYYYA..",".AYYYYYYYYYYA.",".AYYYYYYYYYYA.",".AYFFFFFYYYYA.",".AFFFFFFFFYFA.",".FFFKFFFFKFFF.",".FFFKFFFFKFFF.",".FIFFFFFFFFIF.","..FFKFFFFKFF..","...FFKKKKFF...","..VBBBWWBBBV..",".BBBBWLLWBBBB.","BBVBBWLLWBBVBB","VV.VBBWWBBV.VV","..VVVV..VVVV.."]},
+ {id:"chris",name:"크리스",art:["..N...N...N...",".KNN.KNN.KNN..",".KNNNNNNNNNNK.",".KNNNNNNNNNNK.",".KNFFFFFFFFNK.",".KFFFFFFFFFFK.",".FFFKFFFFKFFF.",".FFFKFFFFKFFF.",".FIFFFFFFFFIF.","..FFKFFFFKFF..","...FFKKKKFF...","..DGGGWWGGGD..",".GGGGWLLWGGGG.","GGDGGWLLWGGDGG","DD.DGGWWGGD.DD","..DDDD..DDDD.."]},
+ {id:"tortuga",name:"토르투가",art:[".....GGGGGG.......","...GGHHGGHHGG.....","..GHHGGHHGGHHG....",".GGGGHHGGHHGGGG.GG","GGHHGGGHHGGGHHGGGG","DDDDDDDDDDDDDDDGWK","SLLSLLSLLSLLSLLSGG","DDDDDDDDDDDDDDDD..",".GGG..GGG..GGG...."]},
+ {id:"tobot_x",name:"또봇 X",art:["....WW....WW....",".....WW..WW.....","....VBBYYBBV....","...VBBBBBBBBV...","...VWLLLLLLWV...","...VBSSSSSSBV...","....VVSSSSVV....","BBBBBWWWWWWBBBBB","BWWBBWLLLLWBBWWB","BBBBVYWWWWYVBBBB",".SS.VBBBBBBV.SS.",".BB.VVVVVVVV.BB.","..KKKBB..BBKKK..","..KSKBB..BBKSK..","..KKKBB..BBKKK..","..BBBBB..BBBBB.."]},
+ {id:"tobot_y",name:"또봇 Y",art:[".......RR.......","......RWWR......",".....RRWWRR.....","...KRRRWWRRRK...","...KLLLLLLLLK...","...KKSSSSSSKK...","EKE.KRSSSSRK.EKE","KSKRRRWLLWRRRKSK","EKERRWWLLWWRREKE",".RR.KRWWWWRK.RR.",".RR.KRRWWRRK.RR.",".KK.KKKKKKKK.KK.","....RRR..RRR....","....RWR..RWR....","....RRR..RRR....","...KKKK..KKKK..."]},
+ {id:"tobot_tritan",name:"트라이탄",art:["...YY...WW...YY...","....YYY.WW.YYY....","......YYBBYY......",".....VBBBBBBV.....",".....VLLLLLLV.....",".....VSSSSSSV.....","CRRRC.VSSSSV.CRRRC","RRRRRVBBBBBBVRRRRR","RWWRRBWLLLLWBRRWWR","RRRRRBWLLLLWBRRRRR","CRRC.BYBBBBYB.CRRC","RRRR.VVVVVVVV.RRRR","KKKK.OOOEEOOO.KKKK","....OOOO..OOOO....","...EKYKE..EKYKE...","..OOOOOO..OOOOOO.."]},
+ {id:"minifig",name:"레고 사람",art:[".....YY.....","...YYYYYY...","..YYYYYYYY..","..YYKYYKYY..","..YYKYYKYY..","..YKYYYYKY..","..YYKKKKYY..","....YYYY....","..RRRRRRRR..",".RRRRRRRRRR.",".RRRRRRRRRR.",".YYRRRRRRYY.",".Y.BBBBBB.Y.","...BBBBBB...","...BB..BB..."]},
+ {id:"castle",name:"레고 성",art:["..R.........R..","..RR........RR.","..S.........S..",".SSS.......SSS.",".SSS.S.S.S.SSS.",".SSSSSSSSSSSSS.",".SLSSSSSSSSSLS.",".SSSSSNNNSSSSS.",".SSSSNNNNNSSSS.",".SSSSNNNNNSSSS."]},
+ {id:"train",name:"레고 기차",art:[".KK.............",".KK......RRRRRR.","BBBBBBB..RLLLLR.","BBBBBBBBBRLLLLR.","YBBBBBBBBRRRRRR.","BBBBBBBBBRRRRRR.","KKKKKKKKKKKKKKKK",".EEE..EEE..EEE..",".ESE..ESE..ESE.."]},
+ {id:"triple",name:"3단 아이스크림",art:[".....D......","....RRR.....","...RWRRR....","..MMMMMMMM..",".MIMMMMMMMM.",".MMMMMMMMMM.","..MWMWWMWW..",".WWWWWWWWWW.",".WWWWWWWWWW.","..NWNNWNNN..",".NNNNNNNNNN.",".NNNNNNNNNN.",".ANAANAANAA.","..AANAANAA..","...AANAAN..."]},
+ {id:"cone",name:"아이스크림 콘",art:["....MMMM....","..MMMMMMMM..",".MMWIMMMMMM.",".MWIMMMMMMM.","MMIMMMMMMMMM","MMMMMMMMMMMM",".MMMMMMMMMM.",".MAMMAMMAMM.",".AAAAAAAAAA.","..ANAANAAN..","..AANAANAA..","...ANAANA...","...AANAAN...","....ANAA....",".....AN....."]},
+ {id:"gelato_cup",name:"젤라또 컵",art:[".........YA.....","........YA......","..MMMM.YAHH.....",".MIMMMMHHHHH....","MMMMMMHHWHHHH...","MMMMMMHHHHHHH...","WWWWWWWWWWWWWW..",".TTWTTWTTWTTW...",".TTWTTWTTWTTW...","..TWTTWTTWTT....","..TWTTWTTWTT....","...WTTWTTWT....."]},
+ {id:"captain_america",name:"캡틴 아메리카",art:[".....BBBBB.....","...BBBBWBBBB...","WWBBBBWBWBBBBWW","WWBBBWWWWWBBBWW",".WBBBWBBBWBBBW.","..BBFKFBFKFBB..","..BFFFFFFFFFB..","..BFFKFFFKFFB..","...FFFKKKFFF...","...BBBBWBBBB...",".BBBBWWWWWBBBB.","RRBBBBWWWBBBBRR","RRBBBBWBWBBBBRR","...RWRWRWRWR...","...BBBB.BBBB...","..RRRRR.RRRRR.."]},
+ {id:"thor",name:"토르",art:[".....SSSSSS......",".WW.SSWSSSSS.WW..","WWWSSSSSSSSSSWWW.","..YYEEEEEEEEYY...","..YFFFFFFFFFFY...","..YFFKFFFFKFFY...","..YFFKFFFFKFFY...","..YFIFFFFFFIFY...","..YFFKFFFFKFFY...",".YYYFFKKKKFFYYY..",".RRKKKKKKKKKKRR..","RRRKSKSKKSKSKEE..","RRRKKKKKKKKKKREN.","RRFKKEEEEEEKKRFN.","RR..KKKKKKKKRESSE","R...EEE..EEE.ESSE"]},
+ {id:"hulkbuster",name:"헐크버스터",art:["......KRRRRK......","......RAAAAR......","..KKK.AWAAWA.KKK..",".KRRRKAAAAAAKRRRK.","KRRAARKAAAAKRAARRK","KRAAARRRRRRRRAAARK","KRRRRRRRLLRRRRRRRK",".KRRRKRLWWLRKRRRK.","..RAR.RRLLRR.RAR..","..RAR.RAAAAR.RAR..",".KRRRK.RRRR.KRRRK.","KRAAARKRRRRKRAAARK","KRAAARKRKKRKRAAARK","KRRRRRKRK.KRKRRRRK",".KKKK.AAA.AAA.KKK.",".....RRRR.RRRR...."]},
+ {id:"fire",name:"소방차",art:["SSSSSSSSSSSS....","S.S.S.S.S.S.S...","RRRRRRRRRRRRRB..","RRRRRRRRRRRRRRR.","RWWRWWRWWRRLLLRR","RRRRRRRRRRRLLLRR","RRRRRRRRRRRRRRRY","SSSSSSSSSSSSSSSS","..EEE.....EEE...","..ESE.....ESE..."]},
+ {id:"ambul",name:"구급차",art:[".....RRBB.......","WWWWWWWWWWW.....","WWWWWRWWWWWWW...","WWWWRRRWWWLLLW..","WWWWWRWWWWLLLWW.","WRRRRRRRRRRRRRRY","KKKKKKKKKKKKKKKK","..EEE.....EEE...","..ESE.....ESE..."]},
+ {id:"firefighter",name:"소방관",art:["....RRRRRR....","...RRRYYRRR...","..RRRRRRRRRR..","....FFFFFF....","....FKFFKF....","....FFFFFF....","....FKKKKF....","..VVVVVVVVVV..",".VVVVVYYVVVVV.",".VVYYYYYYYYVV.",".FV.VVVVVV.KKS",".K..VYYYYV.K..",".KKKVVVVVVKK..","....VV..VV....","....KK..KK...."]},
+ {id:"trex",name:"티라노사우루스",art:[".........GGGGG.","........GGKGGGG","........GGGGGGG","........GGGWWW.","........GGGGGG.","G......GGGG....","GG....GGGGGDD..",".GG..GGGGGG.D..","..GGGGGGGGG....","...GGGGGGGG....",".....GGGGG.....",".....GG..GG....","....GGG..GGG..."]},
+ {id:"trike",name:"트리케라톱스",art:["....NNN.........","...NNNNN........",".W.NNOOOOOOOO...","W.WNOOOOOOOOOOO.",".WOKOOOOOOOOOOOO","WWOOOOOOOOOOOOOO","..OOOOOOOOOOOOO.","....OO.OO..OO.OO","....OO.OO..OO..."]},
+ {id:"brachio",name:"브라키오사우루스",art:["............TTT.","...........TTKTT","...........TTTT.","...........TT...","..........TT....","..........TT....",".........TT.....","....TTTTTTT.....","..TTTTTTTTTT....",".TTTTTTTTTTT....","TT.TTTTTTTTT....","T..TT..TT.TT....","...TT..TT.TT...."]},
+ {id:"digger",name:"포크레인",art:["..........YYY...",".........YYYYY..","........YY...YY.",".......YY.....Y.",".YYYYYYY......Y.",".YLLLYYY.....KKK",".YLLLYYYY....KKK",".YYYYYYYY.....K.","EEEEEEEEEE......","ESESESESEE......",".EEEEEEEE......."]},
+ {id:"dump",name:"덤프트럭",art:["OOOOOOOOO.......","OOOOOOOOOO......",".OOOOOOOOO.YYY..","..OOOOOOOO.YLLY.","SSSSSSSSSSSYLLYY","SSSSSSSSSSSYYYYW","KKKKKKKKKKKKKKKK","..EEE......EEE..","..ESE......ESE.."]},
+ {id:"mixer",name:"레미콘",art:["...OSOSOS.......","..SOSOSOSO......",".SOSOSOSOSO.BBB.","..SOSOSOSO.BLLB.","SSSSSSSSSSSBLLBB","SSSSSSSSSSSBBBBY","KKKKKKKKKKKKKKKK","..EEE......EEE..","..ESE......ESE.."]},
+ {id:"rocket",name:"로켓",art:["....R....","...RRR...","...WWW...","..WWWWW..","..WLLLW..","..WLLLW..","..WWWWW..","..WBWBW..",".RWWWWWR.","RRWWWWWRR","RR.SSS.RR","...OYO...","....O...."]},
+ {id:"astronaut",name:"우주비행사",art:["....WWWWWW....","...WWWWWWWW...","..WWAAAAAAWW..","..WAYYAAAAAW..","..WAYAAAAAAW..","..WWAAAAAAWW..","...WWWWWWWW...",".SWWWWWWWWWWS.","SSWRBWWWWEWWSS","SWWWWWWWWWWWWS",".W.WWWWWWWW.W.",".S.WWWWWWWW.S.","...WWW..WWW...","...WWW..WWW...","..EEEE..EEEE.."]},
+ {id:"ufo",name:"우주선",art:[".....LLLLLL.....","....LLLGGLLL....","...LLLGKKGLLL...","..PPPPPPPPPPPP..","PPYPPYPPYPPYPPYP",".PPPPPPPPPPPPPP.","...PPPPPPPPPP...","....Y...Y...Y..."]},
+ {id:"woody",name:"우디",art:[".....NNNNNN.....","....NNNNNNNN....",".N..KKKKKKKK..N.","NNNNNNNNNNNNNNNN","..NNFFFFFFFFNN..","...FFKFFFFKFF...","...FFKFFFFKFF...","...FIFFFFFFIF...","....FFKKKKFF....","YYWWWKYRYYWWKWYY","RRWKWWRRRRWWAWRR","YYWWWWYRYYWAAAYY","FFNNNNNAANNNNNFF","...BBBBBBBBBB...","...BBBB..BBBB...","..NNNNN..NNNNN.."]},
+ {id:"buzz",name:"버즈 라이트이어",art:["....LLLLLLLL....","...LPPPPPPPPL...","..LPPPPPPPPPPL..","..LPPFFPPFFPPL..","..LPFFFFFFFFPL..","..LPFKFFFFKFPL..","..LPFKFFFFKFPL..","..LPFIFFFFIFPL..","..LPPFKKKKFPPL..","...LPPFFFFPPL...","...WWWWFFWWWW...",".WWWHHWRBWHHWWW.",".HHWWHHWWHHWWHH.",".PPWPPPPPPPPWPP.","...WHHW..WHHW...","..PPPPP..PPPPP.."]},
+ {id:"rex",name:"렉스",art:[".........GGGGGG...","........GGWWGGGGG.",".......GGGWKGGGGGG",".......GGGGGGGGGGG",".......GGGGGGGGGGG",".......GGGGRWRRRWR",".......GGGRRRMMMRR","......DGGGGRWRRWR.",".....DGGGGGGGGGGG.","....DGGGGHHGG.....","...DGGGGHHHHGGG...","G..GGGGGHHHHG.G...","GGGGGGGGHHHHG.....",".GGGGGGGGHHG......","....GGG..GGG......","...GGGG.GGGG......"]},
+ {id:"batman",name:"배트맨",art:["...K........K...","...KK......KK...","..KKKKKKKKKKKK..",".KKWWKKKKKKWWKK.",".KKKWWWKKWWWKKK.",".KKFFFFFFFFFFKK.","..KFFFKKKKFFFK..","...KKFFFFFFKK...","..KEYYYYYYYYEK..",".KEYKYYKKYYKYEK.","KKEYKKKKKKKKYEKK","KKEEEYYKKYYEEEKK","KKKEEEEEEEEEEKKK","KKKKYAYYYYAYKKKK","KKK.EEE..EEE.KKK","KK.KKKK..KKKK.KK"]},
+ {id:"war_machine",name:"워머신",art:["W.W.....KK........","SKSK..KESSEK......","SKSK.KESSSSEK.....","SKSK.KLWSSWLK.....","KEEK.KESSSSEK.....",".KK..KESKKSEK.....","KSSWSK.KSSK.KSWSSK","KSEEEKKSEESKKEEESK","KEEEEKEELLEEKEEEEK",".KSEKKELWWLEKKESK.",".KSEK.KELLEK.KESK.","KSSEK.KKSSKK.KESSK","KKKKK.KEEEEK.KKKKK","....KKSEKKESKK....","....KSEEKKEESK....",".....OYO..OYO....."]},
+ {id:"doctor_strange",name:"닥터 스트레인지",art:["...KKKKKK.........","..KKKKKKKK........",".WKKKKKKKKW.......",".WKFFFFFFKW.......",".WFFKFFKFFW.......",".KFFKFFKFFK.......","RCFFFFFFFFCR......","RCFFEKKEFFCR......","RRCFFEEFFCRR...O..","RRRVVAAVVRRR.OYYO.","RRVBVAGVBVRROY..YO","RRVBVVVVBVFFOY..YO","RRVBVVVVBVRR.OYYO.","RRVVAAAAVVRR...O..","RR.VVV.VVV.RR.....","R..KKK.KKK..R....."]}
+].map(parseModel);
+const MODEL_BY_ID = Object.fromEntries(MODELS.map(m => [m.id, m]));
+const levelOf = mi => Math.min(LEVELS, 1 + Math.floor(mi * LEVELS / MISSIONS.length));
+
+/* 모형 5개 = 미션 1개. 미션이 올라갈수록 단어 레벨도 올라감. 영어는 미션 순서가 달라서 지루하지 않음 */
+const MISSION_SETS = {ko:[{"name":"출동! 경찰 특공대","ids":["police","police_officer","police_heli"]},{"name":"바다의 수호자 해양경찰","ids":["cg_ship","cg_boat","cg_heli"]},{"name":"스파이디와 친구들","ids":["spidey_kid","spin","ghost_spider"]},{"name":"옥토넛 특공대","ids":["barnacles","kwazii","peso"]},{"name":"포켓몬스터","ids":["pikachu","charmander","squirtle"]},{"name":"슝슝 비행기","ids":["plane","jet","seaplane"]},{"name":"스파이더맨","ids":["spidey","spidey_face","spidey_car"]},{"name":"깊은 바다 잠수함","ids":["sub","black_sub","shark"]},{"name":"페파피그","ids":["peppa","george","mr_dino"]},{"name":"헬리콥터 출동","ids":["heli","fire_heli","chinook"]},{"name":"헬로 카봇","ids":["carbot_ace","carbot_fron","carbot_penta"]},{"name":"아이언맨","ids":["ironman","ironman_helmet","ironman_fly"]},{"name":"슈퍼마리오","ids":["mario","luigi","yoshi"]},{"name":"바다를 누비는 배","ids":["pirate","sail","cruise"]},{"name":"와일드 크래츠","ids":["martin","chris","tortuga"]},{"name":"또봇","ids":["tobot_x","tobot_y","tobot_tritan"]},{"name":"레고 마을","ids":["minifig","castle","train"]},{"name":"달콤한 젤라또","ids":["triple","cone","gelato_cup"]},{"name":"어벤져스 어셈블!","ids":["captain_america","thor","hulkbuster"]},{"name":"긴급 출동 119","ids":["fire","ambul","firefighter"]},{"name":"공룡 탐험대","ids":["trex","trike","brachio"]},{"name":"공사장 대작전","ids":["digger","dump","mixer"]},{"name":"우주 탐험대","ids":["rocket","astronaut","ufo"]},{"name":"토이 스토리","ids":["woody","buzz","rex"]},{"name":"최강 히어로 팀","ids":["batman","war_machine","doctor_strange"]}], en:[{"name":"슈퍼마리오","ids":["mario","luigi","yoshi"]},{"name":"포켓몬스터","ids":["pikachu","charmander","squirtle"]},{"name":"페파피그","ids":["peppa","george","mr_dino"]},{"name":"스파이더맨","ids":["spidey","spidey_face","spidey_car"]},{"name":"옥토넛 특공대","ids":["barnacles","kwazii","peso"]},{"name":"어벤져스 어셈블!","ids":["captain_america","thor","hulkbuster"]},{"name":"레고 마을","ids":["minifig","castle","train"]},{"name":"헬리콥터 출동","ids":["heli","fire_heli","chinook"]},{"name":"스파이디와 친구들","ids":["spidey_kid","spin","ghost_spider"]},{"name":"와일드 크래츠","ids":["martin","chris","tortuga"]},{"name":"토이 스토리","ids":["woody","buzz","rex"]},{"name":"아이언맨","ids":["ironman","ironman_helmet","ironman_fly"]},{"name":"헬로 카봇","ids":["carbot_ace","carbot_fron","carbot_penta"]},{"name":"출동! 경찰 특공대","ids":["police","police_officer","police_heli"]},{"name":"공룡 탐험대","ids":["trex","trike","brachio"]},{"name":"깊은 바다 잠수함","ids":["sub","black_sub","shark"]},{"name":"또봇","ids":["tobot_x","tobot_y","tobot_tritan"]},{"name":"슝슝 비행기","ids":["plane","jet","seaplane"]},{"name":"달콤한 젤라또","ids":["triple","cone","gelato_cup"]},{"name":"바다의 수호자 해양경찰","ids":["cg_ship","cg_boat","cg_heli"]},{"name":"바다를 누비는 배","ids":["pirate","sail","cruise"]},{"name":"긴급 출동 119","ids":["fire","ambul","firefighter"]},{"name":"공사장 대작전","ids":["digger","dump","mixer"]},{"name":"우주 탐험대","ids":["rocket","astronaut","ufo"]},{"name":"최강 히어로 팀","ids":["batman","war_machine","doctor_strange"]}]};
+let MISSIONS = MISSION_SETS.ko;
+const useMissions = lang => { MISSIONS = MISSION_SETS[lang] || MISSION_SETS.ko; };
+
+function parseModel(m){
+  let cells = [];
+  m.art.forEach((row, y) => [...row].forEach((ch, x) => { if (PAL[ch]) cells.push({x, y, ch}); }));
+  const minX = Math.min(...cells.map(c => c.x)), maxX = Math.max(...cells.map(c => c.x));
+  cells.forEach(c => { c.x -= minX; });
+  const at = {};
+  cells.forEach((c, i) => { at[c.x + ',' + c.y] = i; });
+  const order = cells.map((_, i) => i).sort((a, b) => cells[b].y - cells[a].y || cells[a].x - cells[b].x);
+  const n = order.length, chunks = [];
+  for (let k = 0; k < STEPS; k++) chunks.push(order.slice(Math.floor(k * n / STEPS), Math.floor((k + 1) * n / STEPS)));
+  return {id:m.id, name:m.name, w:maxX - minX + 1, h:m.art.length, cells, at, chunks};
+}
+
+/* ---------- state ---------- */
+const KEY = 'word-card-collection-v3', PREF = 'word-card-prefs-v1';
+const S = {
+  model:null, on:[], els:[], timers:[], p:0, decks:{}, lastWord:null, answer:null,
+  pieces:[], queue:[], spawnWait:0, phase:'idle', paused:false, speed:1, sound:true,
+  learned:[], col:loadCol(), tickId:null, gid:0, msgTimer:null,
+  lang:'ko', gameLang:'ko', upper:false,
+};
+/* 한글과 영어는 수집함을 따로 가짐 */
+function loadCol(){
+  const c = {ko:new Set(), en:new Set()};
+  try {
+    const v = JSON.parse(localStorage.getItem(KEY) || 'null');
+    if (v) { c.ko = new Set(v.ko || []); c.en = new Set(v.en || []); }
+    else {
+      const old = JSON.parse(localStorage.getItem('word-card-collection-v2') || '[]');
+      old.forEach(id => c.ko.add(id));
+    }
+  } catch (e) {}
+  return c;
+}
+function saveCol(){ try { localStorage.setItem(KEY, JSON.stringify({ko:[...S.col.ko], en:[...S.col.en]})); } catch (e) {} }
+try {
+  const pf = JSON.parse(localStorage.getItem(PREF) || '{}');
+  if (pf.lang === 'en') S.lang = S.gameLang = 'en';
+  if (pf.upper) S.upper = true;
+} catch (e) {}
+function savePrefs(){ try { localStorage.setItem(PREF, JSON.stringify({lang:S.lang, upper:S.upper})); } catch (e) {} }
+const fmt = w => (S.gameLang === 'en' && S.upper) ? w.toUpperCase() : w;
+
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const overlap = (ax, al, bx, bl) => ax < bx + bl && bx < ax + al;
+
+const well = $('#well'), wellWrap = $('#wellWrap'), mbox = $('#mbox'), mgrid = $('#mgrid');
+const pic = $('#pic'), ask = $('#ask'), answerEl = $('#answer'), msgEl = $('#msg');
+
+/* ---------- sound ---------- */
+let ac = null;
+function audio(){
+  if (!S.sound) return null;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+  } catch (e) { return null; }
+  return ac;
+}
+function beep(f, t0, dur, type = 'triangle', vol = .12){
+  const a = audio(); if (!a) return;
+  const t = a.currentTime + t0, o = a.createOscillator(), g = a.createGain();
+  o.type = type; o.frequency.setValueAtTime(f, t);
+  g.gain.setValueAtTime(.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + .01);
+  g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+  o.connect(g).connect(a.destination); o.start(t); o.stop(t + dur + .05);
+}
+const sfx = {
+  right(){ [523, 659, 784, 1047].forEach((f, i) => beep(f, i * .08, .28)); },
+  wrong(){ beep(330, 0, .18, 'sawtooth', .06); beep(220, .16, .32, 'sawtooth', .06); },
+  land(){ beep(150, 0, .09, 'sine', .14); },
+  snap(n){ for (let i = 0; i < n; i++) beep(900 + Math.random() * 400, .1 + i * .045, .04, 'square', .03); },
+  pop(){ beep(500, 0, .08, 'square', .04); beep(300, .07, .12, 'square', .04); },
+  win(){ [523, 523, 659, 784, 659, 784, 1047].forEach((f, i) => beep(f, i * .14, .3, 'square', .06)); },
+};
+
+const voices = {ko:null, en:null};
+let voicesLoaded = false;
+function loadVoices(){
+  try {
+    const v = speechSynthesis.getVoices();
+    voicesLoaded = v.length > 0;
+    voices.ko = v.find(x => LANGS.ko.voice.test(x.lang)) || null;
+    voices.en = v.find(x => /^en-US/i.test(x.lang)) || v.find(x => LANGS.en.voice.test(x.lang)) || null;
+    syncHear();
+  } catch (e) {}
+}
+function syncHear(){
+  const recorded = !!VOICE && Object.keys(VOICE.raw).some(k => k.startsWith('w:' + S.gameLang));
+  $('#hearBtn').hidden = !recorded && (!('speechSynthesis' in window) || (voicesLoaded && !voices[S.gameLang]));
+}
+if ('speechSynthesis' in window) {
+  loadVoices();
+  try { speechSynthesis.addEventListener('voiceschanged', loadVoices); } catch (e) {}
+}
+function utter(text, lang){
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = LANGS[lang].speechLang; if (voices[lang]) u.voice = voices[lang];
+  u.rate = lang === 'en' ? .75 : .8; u.pitch = 1.1;
+  return u;
+}
+function speak(text, lang = S.gameLang){
+  speakSeq([[text, lang]]);
+}
+/* 여러 문장을 차례로 읽음 (언어가 섞여도 각자 맞는 목소리로) */
+function speakSeq(parts){
+  if (!S.sound || !('speechSynthesis' in window)) return;
+  try {
+    try { VOICE.src && VOICE.src.stop(); } catch (e) {}
+    speechSynthesis.cancel();
+    parts.forEach(([text, lang]) => speechSynthesis.speak(utter(text, lang)));
+  } catch (e) {}
+}
+
+/* ---------- recorded voices (natural neural voices, mp3 in JSON bundles) ---------- */
+try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch (e) {}
+var VOICE = {raw:{}, buf:{}, loading:{}, token:0, src:null};
+function loadVoice(part){
+  if (!VOICE.loading[part]) {
+    VOICE.loading[part] = fetch(`voice-${part}.json`).then(r => r.ok ? r.json() : {}).then(j => { Object.assign(VOICE.raw, j); syncHear(); }).catch(() => {});
+  }
+  return VOICE.loading[part];
+}
+async function clipBuf(key){
+  if (VOICE.buf[key]) return VOICE.buf[key];
+  const b64 = VOICE.raw[key], a = audio();
+  if (!b64 || !a) return null;
+  const bin = Uint8Array.from(atob(b64), ch => ch.charCodeAt(0));
+  try { VOICE.buf[key] = await a.decodeAudioData(bin.buffer); } catch (e) { return null; }
+  return VOICE.buf[key];
+}
+function stopVoice(){
+  VOICE.token++;
+  try { VOICE.src && VOICE.src.stop(); } catch (e) {}
+  try { speechSynthesis.cancel(); } catch (e) {}
+}
+/* 녹음된 목소리를 차례로 재생. 녹음이 없으면 기기 음성으로 대신 읽음 */
+async function playVoice(keys, fallback){
+  if (!S.sound) return;
+  stopVoice();
+  const tok = VOICE.token, a = audio();
+  const bufs = [];
+  for (const k of keys) bufs.push(await clipBuf(k));
+  if (tok !== VOICE.token) return;
+  if (!a || bufs.some(b => !b)) { speakSeq(fallback); return; }
+  for (const b of bufs) {
+    if (tok !== VOICE.token) return;
+    await new Promise(res => {
+      const s = a.createBufferSource(), g = a.createGain();
+      g.gain.value = 1.4;
+      s.buffer = b; s.connect(g).connect(a.destination); s.onended = res;
+      VOICE.src = s; s.start();
+    });
+  }
+}
+const sayWord = (w, lang = S.gameLang) => playVoice([`w:${lang}:${w}`], [[w, lang]]);
+
+/* ---------- layout ---------- */
+function layoutWell(){
+  const r = well.getBoundingClientRect(), gap = parseFloat(getComputedStyle(well).columnGap) || 14;
+  well.style.setProperty('--cw', Math.max(60, (r.width - gap - 12) / 2) + 'px');
+  well.style.setProperty('--ch', Math.max(50, (r.height - gap - 20) / 2) + 'px');
+}
+function layoutWellOld(){
+  const r = wellWrap.getBoundingClientRect();
+  const cs = Math.max(26, Math.floor(Math.min((r.width - 8) / COLS, (r.height - 14) / ROWS)));
+  well.style.setProperty('--cs', cs + 'px');
+}
+function layoutModel(){
+  if (!S.model) return;
+  const r = mbox.getBoundingClientRect();
+  const bs = Math.max(4, Math.floor(Math.min(r.width / S.model.w, r.height / (S.model.h + .4))));
+  mgrid.style.setProperty('--bs', bs + 'px');
+}
+new ResizeObserver(() => { layoutWell(); layoutModel(); }).observe(document.body);
+
+/* ---------- model bench ---------- */
+function buildModelDOM(){
+  const m = S.model;
+  S.timers.forEach(clearTimeout); S.timers = [];
+  mgrid.innerHTML = ''; mgrid.classList.remove('celebrate');
+  mgrid.style.setProperty('--mw', m.w); mgrid.style.setProperty('--mh', m.h);
+  S.on = m.cells.map(() => false);
+  S.els = m.cells.map(c => {
+    const d = document.createElement('div');
+    d.className = 'brick ghost';
+    d.style.cssText = `--x:${c.x};--y:${c.y};--bc:${PAL[c.ch]}`;
+    mgrid.appendChild(d);
+    return d;
+  });
+  $('#mname').textContent = S.model.name;
+  layoutModel();
+}
+function updateStuds(){
+  const m = S.model;
+  m.cells.forEach((c, i) => {
+    const a = m.at[c.x + ',' + (c.y - 1)];
+    S.els[i].classList.toggle('stud', S.on[i] && !(a !== undefined && S.on[a]));
+  });
+}
+function addStep(k){
+  S.model.chunks[k].forEach((idx, j) => {
+    clearTimeout(S.timers[idx]);
+    S.on[idx] = true;
+    const el = S.els[idx];
+    el.classList.remove('ghost', 'leaving', 'drop');
+    void el.offsetWidth;
+    el.style.setProperty('--d', (j * 45) + 'ms');
+    el.classList.add('on', 'drop');
+  });
+  updateStuds();
+  sfx.snap(Math.min(8, S.model.chunks[k].length));
+}
+function removeStep(k){
+  S.model.chunks[k].forEach(idx => {
+    S.on[idx] = false;
+    const el = S.els[idx];
+    el.classList.remove('drop');
+    el.classList.add('leaving');
+    S.timers[idx] = setTimeout(() => { el.classList.remove('on', 'leaving', 'stud'); el.classList.add('ghost'); }, 520);
+  });
+  updateStuds();
+}
+function renderMeter(){
+  const meter = $('#meter');
+  meter.innerHTML = '';
+  for (let i = 0; i < STEPS; i++) {
+    const s = document.createElement('span');
+    s.className = 'slot' + (i < S.p ? ' on' : '');
+    meter.appendChild(s);
+  }
+  if (S.p < 0) {
+    const h = document.createElement('span');
+    h.className = 'holes';
+    h.title = '다음 정답은 구멍을 메우는 데 써요';
+    h.innerHTML = `<i></i>구멍 ${-S.p}`;
+    meter.prepend(h);
+  }
+  meter.setAttribute('aria-label', `모형 ${Math.max(0, S.p)}단계 / ${STEPS}단계`);
+  $('#mcount').textContent = `${Math.max(0, S.p)} / ${STEPS}`;
+}
+
+/* ---------- canvas preview of a model ---------- */
+function modelCanvas(m, W, H, silhouette){
+  const cv = document.createElement('canvas');
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr;
+  cv.style.width = '100%'; cv.style.maxWidth = W + 'px'; cv.style.height = 'auto';
+  const ctx = cv.getContext('2d'); ctx.scale(dpr, dpr);
+  const cs = Math.min(W / m.w, H / (m.h + .4));
+  const ox = (W - cs * m.w) / 2, oy = H - cs * (m.h + .4);
+  m.cells.forEach(c => {
+    const col = silhouette ? '#b6c3e2' : PAL[c.ch];
+    const x = ox + c.x * cs, y = oy + (c.y + .4) * cs;
+    ctx.fillStyle = col;
+    ctx.fillRect(x + .5, y + .5, cs - 1, cs - 1);
+    if (m.at[c.x + ',' + (c.y - 1)] === undefined) ctx.fillRect(x + cs * .22, y - cs * .22, cs * .56, cs * .26);
+    if (!silhouette) {
+      ctx.fillStyle = 'rgba(255,255,255,.3)'; ctx.fillRect(x + .5, y + .5, cs - 1, Math.max(1, cs * .12));
+      ctx.fillStyle = 'rgba(0,0,0,.2)'; ctx.fillRect(x + .5, y + cs * .84 - .5, cs - 1, cs * .16);
+    }
+  });
+  return cv;
+}
+
+/* ---------- words & well ---------- */
+/* 지금 미션의 레벨 단어 위주로, 가끔(30%) 이전 레벨 복습 */
+function drawWord(){
+  const words = LANGS[S.gameLang].words;
+  const lvl = levelOf(missionOf(S.model.id));
+  const pick = lvl > 1 && Math.random() < .3 ? 1 + Math.floor(Math.random() * (lvl - 1)) : lvl;
+  const dk = S.gameLang + pick;
+  let deck = S.decks[dk];
+  if (!deck || !deck.length) deck = S.decks[dk] = shuffle(words.map((w, i) => w.level === pick ? i : -1).filter(i => i >= 0));
+  let i = deck.pop();
+  if (words[i].word === S.lastWord && deck.length) { deck.unshift(i); i = deck.pop(); }
+  S.lastWord = words[i].word;
+  return words[i];
+}
+function clearPieces(){
+  well.innerHTML = '';
+  S.pieces = []; S.queue = [];
+}
+function setMsg(text, kind, hold){
+  clearTimeout(S.msgTimer);
+  msgEl.textContent = text;
+  msgEl.className = 'msg' + (kind ? ' ' + kind : '');
+  if (!hold) S.msgTimer = setTimeout(() => { if (S.phase === 'play') setMsg(LANGS[S.gameLang].hint, '', true); }, 2600);
+}
+function nextRound(){
+  clearPieces();
+  const e = drawWord();
+  S.answer = e;
+  pic.textContent = e.emoji;
+  pic.setAttribute('aria-label', '문제 그림');
+  pic.classList.remove('in', 'yay'); void pic.offsetWidth; pic.classList.add('in');
+  ask.hidden = false; answerEl.hidden = true;
+  setMsg(LANGS[S.gameLang].hint, '', true);
+  const wrong = shuffle(e.cand.slice(0, 6)).slice(0, 3);
+  shuffle([e.word, ...wrong]).forEach((w, i) => deal({word:w, correct:w === e.word}, i));
+  layoutWell();
+  S.phase = 'play';
+  setTimeout(() => sfx.snap(4), 80);
+}
+const CARD_COLORS = ['#ff8c8c', '#5fd6ff', '#ffd23f', '#7fe08a'];
+/* 카드 한 장을 테이블에 놓음 */
+function deal(item, i){
+  const p = {word:item.word, correct:item.correct, len:[...item.word].length, alive:true};
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'card deal';
+  b.setAttribute('aria-label', item.word);
+  b.style.cssText = `--i:${i};--len:${p.len};--tilt:${(Math.random() * 4 - 2).toFixed(1)}deg;--pc:${CARD_COLORS[i % 4]}`;
+  const w = document.createElement('span'); w.className = 'w'; w.textContent = item.word; b.appendChild(w);
+  b.addEventListener('click', () => choose(p));
+  p.el = b;
+  well.appendChild(b);
+  S.pieces.push(p);
+}
+function restartTick(){ clearInterval(S.tickId); }
+
+function choose(p){
+  if (S.phase !== 'play' || S.paused || !p.alive) return;
+  p.correct ? onCorrect(p) : onWrong(p);
+}
+function burst(p){
+  const wr = well.getBoundingClientRect(), cr = p.el.getBoundingClientRect();
+  const cs = Math.min(cr.width, cr.height) / 2.2;
+  const cx = cr.left - wr.left + cr.width / 2, cy = cr.top - wr.top + cr.height / 2;
+  for (let i = 0; i < 10; i++) {
+    const s = document.createElement('span');
+    s.className = 'star';
+    const a = (i / 10) * Math.PI * 2, d = cs * (1.3 + Math.random());
+    s.style.cssText = `left:${cx}px;top:${cy}px;--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d}px`;
+    well.appendChild(s);
+    setTimeout(() => s.remove(), 900);
+  }
+}
+function onCorrect(p){
+  S.phase = 'between';
+  p.alive = false;
+  p.el.classList.remove('deal'); p.el.classList.add('right');
+  S.pieces.forEach(q => { if (q.alive) { q.alive = false; q.el.classList.add('fade'); } });
+  S.queue = [];
+  burst(p);
+  ask.hidden = true;
+  answerEl.innerHTML = '<span class="w"></span>';
+  answerEl.firstChild.textContent = S.answer.word;
+  if (S.answer.mean) { const m = document.createElement('span'); m.className = 'mean'; m.textContent = S.answer.mean; answerEl.appendChild(m); }
+  answerEl.classList.toggle('en', S.gameLang === 'en');
+  answerEl.classList.toggle('upper', S.gameLang === 'en' && S.upper);
+  answerEl.hidden = false;
+  pic.setAttribute('aria-label', S.answer.word);
+  pic.classList.remove('in', 'yay'); void pic.offsetWidth; pic.classList.add('yay');
+  S.learned.push(S.answer);
+  sfx.right();
+  setTimeout(() => sayWord(S.answer.word), 250);
+  S.p++;
+  if (S.p > 0) { addStep(S.p - 1); setMsg('딩동댕! 블록을 쌓았어!', 'good', true); }
+  else setMsg(S.p === 0 ? '딩동댕! 구멍을 다 메웠어!' : '딩동댕! 구멍 하나 메웠어!', 'good', true);
+  renderMeter();
+  if (S.p < STEPS) writeSave();
+  const gid = S.gid;
+  if (S.p >= STEPS) setTimeout(() => { if (gid === S.gid) complete(); }, 1500);
+  else setTimeout(() => { if (gid === S.gid) nextRound(); }, 1900);
+}
+function onWrong(p){
+  setTimeout(writeSave, 0);
+  p.alive = false;
+  p.el.classList.remove('deal'); p.el.classList.add('wrong');
+  sfx.wrong();
+  const e = EMOJI[S.gameLang][p.word], em = e ? ' ' + e : '';
+  /* 틀린 카드는 회색으로 두고, 그 낱말의 그림을 보여 줌 */
+  setTimeout(() => {
+    p.el.classList.add('used');
+    if (e) { const i = document.createElement('span'); i.className = 'e'; i.textContent = e; p.el.prepend(i); }
+  }, 450);
+  /* 틀린 낱말도 소리 내어 읽어 줌 */
+  setTimeout(() => sayWord(p.word), 450);
+  if (S.p > 0) {
+    removeStep(S.p - 1);
+    S.p--;
+    setMsg(`그건 '${fmt(p.word)}'${em}! 블록이 하나 떨어졌어`, 'bad');
+  } else {
+    S.p--;
+    setMsg(`그건 '${fmt(p.word)}'${em}! 앗, 구멍이 생겼어`, 'bad');
+  }
+  renderMeter();
+}
+
+/* ---------- 이어하기 저장 (언어별로 한 판씩) ---------- */
+const SAVE = 'word-card-save-v1';
+function readSaves(){ try { return JSON.parse(localStorage.getItem(SAVE) || '{}') || {}; } catch (e) { return {}; } }
+function writeSaves(all){ try { localStorage.setItem(SAVE, JSON.stringify(all)); } catch (e) {} }
+function writeSave(){
+  if (!S.model || S.phase === 'done' || S.phase === 'idle') return;
+  const all = readSaves();
+  all[S.gameLang] = {model:S.model.id, p:S.p, learned:S.learned.map(w => w.word), at:Date.now()};
+  writeSaves(all);
+}
+function clearSave(lang){ const all = readSaves(); delete all[lang]; writeSaves(all); }
+/* 지금도 있는 모형으로 저장된 판만 인정 (모형을 바꾼 뒤 남은 예전 저장은 치움) */
+function validSave(lang){ const s = readSaves()[lang]; return s && MODEL_BY_ID[s.model] ? s : null; }
+/* '저장 안 하고 나가기'용: 지난번 저장 상태(모은 모형 + 만들던 판)를 기억해 둠 */
+function takeSnap(lang){ S.snap = S.snap || {}; const s = readSaves()[lang]; S.snap[lang] = {col: [...S.col[lang]], save: s || null}; }
+function restoreSnap(lang){
+  const s = S.snap && S.snap[lang]; if (!s) return;
+  S.col[lang] = new Set(s.col); saveCol();
+  const all = readSaves(); if (s.save) all[lang] = s.save; else delete all[lang]; writeSaves(all);
+}
+function dropOrphanSaves(){
+  const all = readSaves(); let changed = false;
+  for (const l of Object.keys(all)) if (!all[l] || !MODEL_BY_ID[all[l].model]) { delete all[l]; changed = true; }
+  if (changed) writeSaves(all);
+}
+
+/* ---------- start / finish ---------- */
+function startGame(model){
+  S.gid++;
+  S.askOnOpen = false;
+  S.model = model; S.p = 0; S.learned = []; S.paused = false; S.lastWord = null;
+  S.gameLang = S.lang;
+  applyLang();
+  useMissions(S.gameLang);
+  const mi = missionOf(model.id);
+  $('#mlabel').textContent = `미션 ${mi + 1} · ${MISSIONS[mi].name} · 레벨 ${levelOf(mi)}`;
+  loadVoice(S.gameLang); loadVoice('common');
+  clearPieces();
+  buildModelDOM();
+  renderMeter();
+  $('#startOv').hidden = true; $('#doneOv').hidden = true;
+  restartTick();
+  const gid = S.gid;
+  S.phase = 'between';
+  armBack();
+  setTimeout(() => { if (gid === S.gid) nextRound(); }, 350);
+}
+const missionOf = id => MISSIONS.findIndex(m => m.ids.includes(id));
+const colOf = (lang = S.lang) => S.col[lang];
+const gotIn = (i, lang) => MISSIONS[i].ids.filter(id => colOf(lang).has(id)).length;
+const cleared = (i, lang) => gotIn(i, lang) === MISSIONS[i].ids.length;
+const curMission = lang => MISSIONS.findIndex((_, i) => !cleared(i, lang));
+function tileFor(id, W, H, lang){
+  const m = MODEL_BY_ID[id], got = colOf(lang).has(id);
+  const d = document.createElement('div');
+  d.className = 'stile ' + (got ? 'got' : 'miss');
+  d.appendChild(modelCanvas(m, W, H, !got));
+  const n = document.createElement('span'); n.textContent = got ? m.name : '?'; d.appendChild(n);
+  return d;
+}
+function complete(){
+  S.phase = 'done';
+  clearSave(S.gameLang);
+  const lang = S.gameLang, mi = missionOf(S.model.id), before = cleared(mi, lang);
+  colOf(lang).add(S.model.id); saveCol();
+  S.justCleared = !before && cleared(mi, lang) ? mi : -1;
+  S.allClear = S.justCleared >= 0 && curMission(lang) < 0;
+  mgrid.classList.add('celebrate');
+  sfx.win();
+  const pi = Math.floor(Math.random() * PRAISE[lang].length);
+  S.praise = PRAISE[lang][pi];
+  const keys = [`n:${S.model.id}`];
+  if (S.justCleared >= 0) keys.push(S.allClear ? 'x:allclear' : 'x:clear');
+  keys.push(`p:${lang}:${pi}:a`);
+  const fb = [[S.model.name + ' 완성!' + (S.justCleared >= 0 ? ' 미션 클리어!' : ''), 'ko'], [S.praise, lang]];
+  setTimeout(() => playVoice(keys, fb), 700);
+  const gid = S.gid;
+  setTimeout(() => { if (gid === S.gid) showDone(); }, 1600);
+}
+function showDone(){
+  $('#doneTitle').textContent = `${S.model.name} 완성!`;
+  const pr = $('#donePraise');
+  pr.textContent = S.praise || '';
+  pr.classList.toggle('lat', S.gameLang === 'en');
+  const dm = $('#doneModel'); dm.innerHTML = '';
+  dm.appendChild(modelCanvas(S.model, 300, 220, false));
+  const mc = $('#mclear'), ci = S.justCleared;
+  mc.hidden = ci < 0;
+  if (ci >= 0) {
+    const next = curMission(S.gameLang);
+    mc.innerHTML = `<div class="medal"></div><h3>미션 ${ci + 1} 클리어!</h3><p></p><div class="row5"></div><p></p>`;
+    const ps = mc.querySelectorAll('p');
+    ps[0].textContent = `'${MISSIONS[ci].name}' 모형 ${MISSIONS[ci].ids.length}개를 다 모았어!`;
+    MISSIONS[ci].ids.forEach(id => mc.querySelector('.row5').appendChild(tileFor(id, 120, 88, S.gameLang)));
+    ps[1].textContent = next >= 0 ? `다음 미션 ${next + 1}: ${MISSIONS[next].name}` + (levelOf(next) > levelOf(ci) ? ` · 단어 레벨 ${levelOf(next)}로 올라가요!` : '') : `미션 ${MISSIONS.length}개를 모두 깼어! 최고의 블록 대장!`;
+    setTimeout(() => [784, 988, 1175, 1568].forEach((f, i) => beep(f, i * .12, .35, 'triangle', .1)), 300);
+  }
+  const box = $('#learned'); box.innerHTML = '';
+  S.learned.forEach(w => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<i></i><span></span>`;
+    b.querySelector('i').textContent = w.emoji;
+    const sp = b.querySelector('span');
+    sp.textContent = fmt(w.word);
+    if (w.mean) {
+      sp.className = 'lat';
+      const m = document.createElement('small'); m.textContent = w.mean; b.appendChild(m);
+    }
+    b.addEventListener('click', () => sayWord(w.word));
+    box.appendChild(b);
+  });
+  $('#doneOv').hidden = false;
+  confetti();
+}
+function confetti(){
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cols = ['#e3271b', '#1e66c9', '#ffcd1f', '#2f9b47', '#ff8a1c', '#9146c2', '#5fd6ff'];
+  for (let i = 0; i < 80; i++) {
+    const c = document.createElement('span');
+    c.className = 'confetti';
+    c.style.cssText = `left:${Math.random() * 100}vw;background:${cols[i % cols.length]};--t:${2 + Math.random() * 2}s;--dl:${Math.random() * .8}s;--rot:${Math.random() * 900 - 450}deg`;
+    document.body.appendChild(c);
+    setTimeout(() => c.remove(), 5000);
+  }
+}
+function showStart(){
+  useMissions(S.lang);
+  const cm = curMission(S.lang);
+  loadVoice(S.lang);
+  /* 지금 미션에서 아직 안 만든 모형만 보여 줌 */
+  const pool = cm >= 0 ? MISSIONS[cm].ids.filter(id => !colOf().has(id)).map(id => MODEL_BY_ID[id]) : MODELS.slice();
+  const picks = shuffle(pool).slice(0, 3);
+  const card = $('#missionCard');
+  if (cm >= 0) {
+    card.innerHTML = `<div class="mission-top"><span class="mbadge">미션 ${cm + 1} / ${MISSIONS.length}</span><span class="mission-name"></span><span class="lvl">단어 레벨 ${levelOf(cm)}</span><span class="mission-count">${gotIn(cm)} / ${MISSIONS[cm].ids.length}</span></div><div class="row5"></div>`;
+    card.querySelector('.mission-name').textContent = MISSIONS[cm].name;
+    MISSIONS[cm].ids.forEach(id => card.querySelector('.row5').appendChild(tileFor(id, 120, 88)));
+  } else {
+    card.innerHTML = `<div class="mission-top"><span class="mbadge">미션 ${MISSIONS.length} / ${MISSIONS.length}</span><span class="mission-name">모든 미션 클리어!</span></div><p class="rules" style="text-align:left">좋아하는 모형을 골라서 또 만들어 봐요.</p>`;
+  }
+  const ch = $('#choices'); ch.innerHTML = '';
+  ch.style.gridTemplateColumns = `repeat(${Math.max(1, picks.length)},minmax(0,${picks.length < 3 ? '200px' : '1fr'}))`;
+  ch.style.justifyContent = 'center';
+  picks.forEach(m => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'choice';
+    b.appendChild(modelCanvas(m, 150, 110, false));
+    const n = document.createElement('span'); n.textContent = m.name; b.appendChild(n);
+    if (!colOf().has(m.id)) { const t = document.createElement('span'); t.className = 'new'; t.textContent = '새 모형'; b.appendChild(t); }
+    b.addEventListener('click', () => { audio(); startGame(m); writeSave(); });
+    ch.appendChild(b);
+  });
+  const shelf = $('#shelf'); shelf.innerHTML = '';
+  MISSIONS.forEach((ms, i) => {
+    const g = document.createElement('div');
+    const locked = cm >= 0 && i > cm;
+    g.className = 'mgroup' + (locked ? ' locked' : '');
+    const status = cleared(i) ? '<span class="stamp">클리어!</span>'
+      : locked ? '<span class="lock">잠겨 있어요</span>'
+      : `<span class="mission-count">${gotIn(i)} / ${ms.ids.length}</span>`;
+    g.innerHTML = `<div class="mgroup-head"><b></b>${status}</div><div class="row5"></div>`;
+    g.querySelector('b').textContent = `미션 ${i + 1} · ${ms.name}`;
+    ms.ids.forEach(id => g.querySelector('.row5').appendChild(tileFor(id, 120, 88)));
+    shelf.appendChild(g);
+  });
+  $('#colCount').textContent = `미션 ${MISSIONS.filter((_, i) => cleared(i)).length} / ${MISSIONS.length} · 모형 ${colOf().size} / ${MODELS.length}`;
+  $('#shelfLang').textContent = S.lang === 'en' ? '영어 놀이' : '한글 놀이';
+  const live = S.paused && S.lang === S.gameLang && S.phase !== 'idle';
+  const sv = readSaves()[S.lang], svModel = sv && MODEL_BY_ID[sv.model];
+  const rcm = live ? S.model : svModel, rcp = live ? S.p : sv && sv.p;
+  /* 앱을 열 때마다: 미션을 몇 개 깼든 '저장한 데부터 / 처음부터'를 고르게 함 */
+  const have = colOf(S.lang);
+  const showCard = !!rcm || (S.askOnOpen && have.size > 0);
+  $('#resumeCard').hidden = !showCard;
+  if (showCard) {
+    const box = $('#rcModel'); box.innerHTML = '';
+    const pic = rcm || MODEL_BY_ID[[...have].pop()];
+    if (pic) box.appendChild(modelCanvas(pic, 110, 80, false));
+    const cmi = curMission(S.lang);
+    const where = cmi >= 0 ? `미션 ${cmi + 1} · ${MISSIONS[cmi].name}` : '모든 미션 클리어';
+    $('#rcTitle').textContent = '지난번에 저장된 게임이 있어요';
+    $('#rcInfo').textContent = rcm
+      ? (rcp < 0 ? `${where} · ${rcm.name} 구멍 ${-rcp}개 메우는 중` : `${where} · ${rcm.name} 블록 ${rcp} / ${STEPS}`)
+      : `${where} · 모은 모형 ${have.size}개`;
+    resetRestartLabel();
+  }
+  document.querySelectorAll('.mode').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === S.lang)));
+  $('#doneOv').hidden = true;
+  $('#startOv').hidden = false;
+  /* 저장된 게임이 있는 놀이에는 '저장된 게임' 표시를 붙임 */
+  document.querySelectorAll('.mode').forEach(b => {
+    const old = b.querySelector('.pill'); if (old) old.remove();
+    if (validSave(b.dataset.lang) || (S.askOnOpen && colOf(b.dataset.lang).size > 0)) { const pl = document.createElement('span'); pl.className = 'pill'; pl.textContent = '저장됨'; b.appendChild(pl); }
+  });
+  $('#startOv').scrollTop = 0;
+  if (window.__pendingReload) location.reload();
+}
+
+/* ---------- language ---------- */
+function applyLang(){
+  const L = LANGS[S.gameLang];
+  well.classList.toggle('en', S.gameLang === 'en');
+  well.classList.toggle('upper', S.upper);
+  const logo = $('#logo');
+  logo.setAttribute('aria-label', L.name);
+  const cols = ['#ff8c8c', '#5fd6ff', '#ffd23f', '#7fe08a'];
+  logo.innerHTML = L.logo.map((t, i) => `<span class="tile" style="--pc:${cols[i]}${S.gameLang === 'en' ? ';font-family:var(--f-latin)' : ''}">${t}</span>`).join('')
+    + `<span class="tag">${S.gameLang === 'en' ? '카드 대작전' : '대작전'}</span>`;
+  $('#caseBtn').hidden = S.gameLang !== 'en';
+  $('#caseLabel').textContent = S.upper ? 'ABC' : 'abc';
+  syncHear();
+}
+document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => {
+  S.lang = b.dataset.lang;
+  savePrefs();
+  showStart();
+}));
+$('#caseBtn').addEventListener('click', () => {
+  S.upper = !S.upper;
+  savePrefs();
+  applyLang();
+  answerEl.classList.toggle('upper', S.upper);
+});
+
+/* ---------- controls ---------- */
+$('#resumeBtn').addEventListener('click', () => {
+  audio();
+  if (S.paused && S.lang === S.gameLang && S.phase !== 'idle') { S.paused = false; $('#startOv').hidden = true; return; }
+  if (validSave(S.lang)) { resumeSaved(); return; }
+  /* 만들던 모형은 없고 모은 기록만 있으면: 그 미션에서 다음 모형을 고르게 함 */
+  S.askOnOpen = false;
+  showStart();
+  const h = $('#chooseH'); if (h) h.scrollIntoView({block: 'center'});
+});
+/* 하던 모형을 0블록부터 다시 시작 */
+/* 처음부터 새로 시작하기: 이 놀이(한글/영어)의 모은 모형·미션·저장한 판을 지우고 미션 1부터 (실수 방지로 한 번 더 누르기) */
+let restartArmedAt = 0;
+function resetRestartLabel(){ restartArmedAt = 0; $('#restartBtn').textContent = '처음부터 새로 시작하기'; }
+$('#restartBtn').addEventListener('click', () => {
+  audio();
+  if (Date.now() - restartArmedAt > 5000) {
+    restartArmedAt = Date.now();
+    $('#restartBtn').textContent = '정말 처음부터 할까요? 한 번 더 누르면 미션 1부터 시작해요';
+    setTimeout(() => { if (restartArmedAt && Date.now() - restartArmedAt >= 5000) resetRestartLabel(); }, 5100);
+    return;
+  }
+  resetRestartLabel();
+  const lang = S.lang;
+  S.col[lang] = new Set(); saveCol(); clearSave(lang);
+  if (S.gameLang === lang && S.phase !== 'idle') {
+    S.gid++; S.paused = false; S.phase = 'idle'; S.p = 0; S.learned = []; S.answer = null;
+    clearPieces(); buildModelDOM(); renderMeter();
+  }
+  takeSnap(lang);
+  S.askOnOpen = false;
+  showStart();
+  const h = $('#chooseH'); if (h) h.scrollIntoView({block: 'center'});
+});
+/* 저장해 둔 판을 다시 불러옴: 모형, 쌓은 블록(구멍 포함), 맞힌 단어 */
+function resumeSaved(){
+  const sv = readSaves()[S.lang], m = sv && MODEL_BY_ID[sv.model];
+  if (!m) return;
+  startGame(m);
+  S.p = Math.max(-STEPS, Math.min(STEPS - 1, sv.p | 0));
+  for (let k = 0; k < S.p; k++) addStep(k);
+  const byWord = Object.fromEntries(LANGS[S.gameLang].words.map(w => [w.word, w]));
+  S.learned = (sv.learned || []).map(w => byWord[w]).filter(Boolean);
+  renderMeter();
+}
+function openQuit(){
+  S.paused = true;
+  const qm = $('#quitModel'); qm.innerHTML = '';
+  qm.appendChild(modelCanvas(S.model, 200, 140, false));
+  const done = Math.max(0, S.p);
+  $('#quitInfo').textContent = S.p < 0
+    ? `${S.model.name} · 구멍 ${-S.p}개 메우는 중`
+    : `${S.model.name} · 블록 ${done} / ${STEPS} 쌓았어요`;
+  $('#quitOv').hidden = false;
+  $('#saveQuitBtn').focus();
+}
+$('#saveQuitBtn').addEventListener('click', () => {
+  writeSave();
+  takeSnap(S.gameLang);
+  $('#quitOv').hidden = true;
+  showStart();
+});
+$('#resetQuitBtn').addEventListener('click', () => {
+  S.gid++; S.paused = false; S.phase = 'idle'; S.p = 0; S.learned = []; S.answer = null;
+  clearPieces(); buildModelDOM(); renderMeter();
+  /* 이번에 한 것(새로 모은 모형 포함)을 버리고 지난번 저장 상태로 되돌림 */
+  restoreSnap(S.gameLang);
+  $('#quitOv').hidden = true;
+  showStart();
+});
+$('#keepBtn').addEventListener('click', () => { S.paused = false; $('#quitOv').hidden = true; });
+/* 휴대폰 뒤로가기: 게임 중이면 바로 꺼지지 않고 '그만할까요?' 창을 띄움 (앱으로 설치했을 때) */
+const OWN_WINDOW = (() => { try { return window.top === window; } catch (e) { return false; } })();
+function armBack(){
+  if (!OWN_WINDOW) return;
+  try { if (!(history.state && history.state.inGame)) history.pushState({inGame:1}, ''); } catch (e) {}
+}
+window.addEventListener('popstate', () => {
+  if (!OWN_WINDOW) return;
+  if (!$('#quitOv').hidden) { S.paused = false; $('#quitOv').hidden = true; armBack(); return; }
+  if (S.phase === 'play') { openQuit(); armBack(); return; }
+  if (S.phase === 'between' && !S.paused) armBack();
+});
+$('#againBtn').addEventListener('click', () => { S.paused = false; showStart(); });
+$('#homeBtn').addEventListener('click', () => {
+  if (S.phase === 'between') return;
+  if (S.phase === 'play') { openQuit(); return; }
+  showStart();
+});
+$('#hearBtn').addEventListener('click', () => { audio(); if (S.answer) sayWord(S.answer.word); });
+$('#speedBtn').addEventListener('click', () => {
+  S.speed = (S.speed + 1) % SPEEDS.length;
+  $('#speedLabel').textContent = SPEEDS[S.speed].label;
+  $('#speedBtn').setAttribute('aria-label', '떨어지는 속도: ' + SPEEDS[S.speed].label);
+  restartTick();
+});
+$('#soundBtn').addEventListener('click', () => {
+  S.sound = !S.sound;
+  $('#soundLabel').textContent = S.sound ? '소리 켬' : '소리 끔';
+  $('#soundWave').style.display = S.sound ? '' : 'none';
+  if (!S.sound) stopVoice();
+  else beep(660, 0, .08, 'square', .05);
+});
+
+/* 첫 화면: 뒤에 예시 판을 깔아 두고 시작 화면을 띄움 */
+S.model = MODELS[1];
+buildModelDOM();
+[0, 1, 2, 3].forEach(k => S.model.chunks[k].forEach(i => { S.on[i] = true; S.els[i].classList.remove('ghost'); S.els[i].classList.add('on'); }));
+updateStuds();
+S.p = 4; renderMeter(); S.p = 0;
+/* 껐다 켰을 때: 가장 최근에 하던 놀이로 열어서 '이어서 하기'가 바로 보이게 함 */
+dropOrphanSaves();
+['ko', 'en'].forEach(takeSnap);
+S.askOnOpen = true;
+{
+  const all = readSaves(); let best = null;
+  for (const l of ['ko', 'en']) if (all[l] && (!best || (all[l].at || 0) > (all[best].at || 0))) best = l;
+  if (best && best !== S.lang) { S.lang = S.gameLang = best; savePrefs(); }
+}
+applyLang();
+layoutWell();
+showStart();
+loadVoice('common');
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  let hadController = !!navigator.serviceWorker.controller;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      const check = () => { try { reg.update(); } catch (e) {} };
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) check(); });
+      setInterval(check, 20 * 60 * 1000);
+    }).catch(() => {});
+  });
+  /* 새 버전이 준비되면 처음 화면에서 바로 새로고침 (게임 중이면 처음 화면으로 돌아올 때) */
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController) { hadController = true; return; }
+    const o = document.getElementById('startOv');
+    if (o && !o.hidden) location.reload(); else window.__pendingReload = true;
+  });
+}
+</script>
+</body>
+</html>
